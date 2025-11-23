@@ -1,9 +1,5 @@
 package cpu
 
-type CPU struct {
-	Registers Registers
-}
-
 func (cpu *CPU) Add_A(value uint8) {
 	isHalfCarry := (cpu.Registers.A&0x0f)+(value&0x0f) > 0x0f
 	sum16 := uint16(cpu.Registers.A) + uint16(value)

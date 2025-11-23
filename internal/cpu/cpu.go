@@ -1,5 +1,9 @@
 package cpu
 
+import (
+	"github.com/shubhdevelop/emuGBC/internal/mmu"
+)
+
 type Registers struct {
 	// 8-bit registers
 	A, F uint8
@@ -21,6 +25,17 @@ const (
 	FlagH = 1 << 5 // Half Carry
 	FlagC = 1 << 4 // Carry
 )
+
+type CPU struct {
+	Registers Registers
+	Bus       *mmu.MMU
+}
+
+func NewCPU(bus *mmu.MMU) *CPU {
+	return &CPU{
+		Bus: bus,
+	}
+}
 
 func (r *Registers) GetFlag(flag uint8) bool {
 	return (r.F & flag) != 0
