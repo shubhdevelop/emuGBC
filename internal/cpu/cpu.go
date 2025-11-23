@@ -1,6 +1,8 @@
 package cpu
 
 import (
+	"fmt"
+
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
 )
 
@@ -83,4 +85,39 @@ func (r *Registers) SetHL(value uint16) {
 func (r *Registers) SetAF(value uint16) {
 	r.A = uint8((value & 0xFF00) >> 8)
 	r.F = uint8(value&0x00FF) & 0xF0
+}
+
+// Step executes the next instruction
+func (cpu *CPU) Step() {
+	opcode := cpu.Bus.Read(cpu.Registers.PC)
+	cpu.Registers.PC++
+
+	switch opcode {
+	case 0x00:
+		return
+
+	case 0x04:
+		cpu.Registers.B++
+		return
+
+	case 0x05:
+		cpu.Registers.B--
+		return
+
+	case 0x06:
+		// LD B, n (Load 8-bit immediate value into B)
+		value := cpu.Bus.Read(cpu.Registers.PC)
+		cpu.Registers.B = value
+
+		/*
+		 * We need to read the NEXT byte.
+		 * This is because the opcode is 2 bytes long.
+		 * We consumed a second byte, so increment PC again!
+		 */
+		cpu.Registers.PC++ //
+		return
+
+	default:
+		panic(fmt.Sprintf("Unknown Opcode: 0x%X at PC: 0x%X", opcode, cpu.Registers.PC-1))
+	}
 }
