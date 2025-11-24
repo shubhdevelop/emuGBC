@@ -31,7 +31,7 @@ func main() {
 	cpu.Bus.LoadROM(romData)
 	fmt.Println("Starting execution...")
 
-	for i := 0; i < 10; i++ {
+	for range [10]int{} {
 		cpu.Step()
 	}
 
@@ -57,8 +57,8 @@ func main() {
 	// Decode it!
 	tile := ppu.DecodeTile(tileData)
 	fmt.Println("Decoded Tile (ASCII View):")
-	for y := 0; y < 8; y++ {
-		for x := 0; x < 8; x++ {
+	for y := range [8]int{} {
+		for x := range [8]int{} {
 			id := tile[y][x]
 
 			// Map IDs to characters so we can "see" the image

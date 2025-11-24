@@ -36,12 +36,12 @@ func DecodeTile(data []byte) Tile {
 	var tile Tile
 
 	// A tile has 8 rows (height)
-	for y := 0; y < 8; y++ {
+	for y := range [8]int{} {
 		lowByte := data[y*2]
 		highByte := data[y*2+1]
 
 		// A row has 8 pixels (width)
-		for x := 0; x < 8; x++ {
+		for x := range [8]int{} {
 			bitIndex := 7 - x
 
 			// 1. Extract the bit from the Low Byte
