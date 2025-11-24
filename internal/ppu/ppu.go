@@ -1,0 +1,63 @@
+package ppu
+
+// LCDC Flags (Bit positions)
+const (
+	LCDC_BG_ENABLE   = 0x01 // Bit 0
+	LCDC_OBJ_ENABLE  = 0x02 // Bit 1
+	LCDC_OBJ_SIZE    = 0x04 // Bit 2
+	LCDC_BG_MAP      = 0x08 // Bit 3
+	LCDC_BG_WIN_DATA = 0x10 // Bit 4
+	LCDC_WIN_ENABLE  = 0x20 // Bit 5
+	LCDC_WIN_MAP     = 0x40 // Bit 6
+	LCDC_ENABLE      = 0x80 // Bit 7
+)
+
+type PPU struct {
+
+	// The Control Register
+	Lcdc uint8
+}
+
+func NewPPU() *PPU {
+	return &PPU{}
+}
+
+func (p *PPU) ReadLCDC() uint8 {
+	return p.Lcdc
+}
+
+func (p *PPU) WriteLCDC(val uint8) {
+	p.Lcdc = val
+}
+
+type Tile [8][8]uint8
+
+func DecodeTile(data []byte) Tile {
+	var tile Tile
+
+	// A tile has 8 rows (height)
+	for y := 0; y < 8; y++ {
+		lowByte := data[y*2]
+		highByte := data[y*2+1]
+
+		// A row has 8 pixels (width)
+		for x := 0; x < 8; x++ {
+			bitIndex := 7 - x
+
+			// 1. Extract the bit from the Low Byte
+			// Shift right by bitIndex to put the target bit at position 0, then AND with 1.
+			lowBit := (lowByte >> bitIndex) & 0x01
+
+			// 2. Extract the bit from the High Byte
+			highBit := (highByte >> bitIndex) & 0x01
+
+			// 3. Combine them to get the Color ID (0-3)
+			// The High Bit is worth 2, the Low Bit is worth 1.
+			colorID := (highBit << 1) | lowBit
+
+			tile[y][x] = colorID
+		}
+	}
+
+	return tile
+}
