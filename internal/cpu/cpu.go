@@ -35,8 +35,21 @@ func (cpu *CPU) FetchWord() uint16 {
 	return w
 }
 
+func (cpu *CPU) Log() {
+	// Print current state BEFORE executing the instruction
+	fmt.Printf("PC:%04X AF:%04X BC:%04X DE:%04X HL:%04X SP:%04X\n",
+		cpu.Registers.PC,
+		cpu.Registers.GetAF(),
+		cpu.Registers.GetBC(),
+		cpu.Registers.GetDE(),
+		cpu.Registers.GetHL(),
+		cpu.Registers.SP,
+	)
+}
+
 // Step executes the next instruction
 func (cpu *CPU) Step() int {
+	cpu.Log()
 	pc := cpu.Registers.PC
 	opcode := cpu.FetchByte() // advances PC by 1
 
