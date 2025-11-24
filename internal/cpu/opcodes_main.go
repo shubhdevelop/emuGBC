@@ -12,11 +12,11 @@ var mainOpcodes = [256]Opcode{
 	0x08: {Fn: (*CPU).InstrLD_a16_SP, Cycles: 20, Mnemonic: "LD (a16), SP"},
 	0x0A: {Fn: (*CPU).InstrLD_A_BC, Cycles: 8, Mnemonic: "LD A, (BC)"},
 	0x0E: {Fn: (*CPU).InstrLD_C_d8, Cycles: 8, Mnemonic: "LD C, d8"},
-	0x11: {},
-	0x12: {},
-	0x16: {},
-	0x1A: {},
-	0x1E: {},
+	0x11: {Fn: (*CPU).InstrLD_DE_d16, Cycles: 8, Mnemonic: "LD DE, n16"},
+	0x12: {Fn: (*CPU).InstrLD_DE_A, Cycles: 8, Mnemonic: "LD [DE], A"},
+	0x16: {Fn: (*CPU).InstrLD_D_d8, Cycles: 8, Mnemonic: "LD D, n8"},
+	0x1A: {Fn: (*CPU).InstrLD_A_DE, Cycles: 8, Mnemonic: "LD A, [DE]"},
+	0x1E: {Fn: (*CPU).InstrLD_E_d8, Cycles: 8, Mnemonic: "LD E, n8"},
 	0x21: {},
 	0x22: {},
 	0x26: {},
@@ -123,4 +123,3 @@ func (cpu *CPU) InstrPrefixCB() {
 	}
 	fn(cpu)
 }
-

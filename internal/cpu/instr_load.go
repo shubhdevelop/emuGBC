@@ -43,7 +43,7 @@ func (cpu *CPU) InstrLD_a16_SP() {
 
 /*
 OPCODE: 0x0A
-DESCRIPTION: Load the 16 bit memory address from BC into A
+DESCRIPTION: SET A with [BC]
 CYCLE: 8
 */
 func (cpu *CPU) InstrLD_A_BC() {
@@ -54,10 +54,62 @@ func (cpu *CPU) InstrLD_A_BC() {
 
 /*
 OPCODE: 0x0E
-DESCRIPTION: Load next 8 bits into C
+DESCRIPTION: SET C with 8 bits
 CYCLE: 8
 */
 func (cpu *CPU) InstrLD_C_d8() {
 	b := cpu.FetchByte()
 	cpu.Registers.C = b
+}
+
+/*
+OPCODE: 0x11
+DESCRIPTION: SET DE with 16 bits
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLD_DE_d16() {
+	w := cpu.FetchWord()
+	cpu.Registers.SetDE(w)
+}
+
+/*
+OPCODE: 0x12
+DESCRIPTION: SET [DE] with A
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_DE_A() {
+	addr := cpu.Registers.GetDE()
+	val := cpu.Registers.A
+	cpu.Bus.Write(addr, val)
+}
+
+/*
+OPCODE: 0x16
+DESCRIPTION: SET D with 8 bits
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_D_d8() {
+	b := cpu.FetchByte()
+	cpu.Registers.D = b
+}
+
+/*
+OPCODE: 0x1A
+DESCRIPTION: SET A with [DE]
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_A_DE() {
+	addr := cpu.Registers.GetDE()
+	b := cpu.Bus.Read(addr)
+	cpu.Registers.A = b
+}
+
+/*
+OPCODE: 0x1E
+DESCRIPTION: SET E with 8 bits
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_E_d8() {
+	b := cpu.FetchByte()
+	cpu.Registers.E = b
 }
