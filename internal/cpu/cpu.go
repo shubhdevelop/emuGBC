@@ -65,9 +65,6 @@ func (cpu *CPU) Log() {
 	}
 }
 
-func (cpu *CPU) Push() {}
-func (cpu *CPU) Pop()  {}
-
 // Step executes the next instruction
 func (cpu *CPU) Step() int {
 	cpu.Log()
@@ -81,18 +78,39 @@ func (cpu *CPU) Step() int {
 	// CB prefix
 	if opcode == 0xCB {
 		cb := cpu.FetchByte()
-		fmt.Printf("Current Opcode: 0x%02X\n", cb)
-		fn := cbOpcodes[cb].Fn
-		if fn == nil {
+		entry := cbOpcodes[cb]
+		fmt.Printf("Current CB Opcode: 0x%02X Mnemonic: %s \n", opcode, entry.Mnemonic)
+		if entry.Fn == nil {
 			panic(fmt.Sprintf("Undefined CB opcode 0x%02X at PC: 0x%04X", cb, cpu.Registers.PC-1))
 		}
-		return fn(cpu)
+		return entry.Fn(cpu)
 	}
 
-	fmt.Printf("Current Opcode: 0x%02X\n", opcode)
 	entry := mainOpcodes[opcode]
+	fmt.Printf("Current Opcode: 0x%02X Mnemonic: %s \n", opcode, entry.Mnemonic)
 	if entry.Fn == nil {
 		panic(fmt.Sprintf("Undefined opcode 0x%02X at PC: 0x%04X", opcode, cpu.Registers.PC))
 	}
 	return entry.Fn(cpu)
+}
+
+func (cpu *CPU) Push(val uint16) {
+	high := uint8(val >> 8)
+	low := uint8(val & 0xFF)
+
+	cpu.Registers.SP--
+	cpu.Bus.Write(cpu.Registers.SP, high)
+
+	cpu.Registers.SP--
+	cpu.Bus.Write(cpu.Registers.SP, low)
+}
+
+func (cpu *CPU) Pop() uint16 {
+	low := cpu.Bus.Read(cpu.Registers.SP)
+	cpu.Registers.SP++
+
+	high := cpu.Bus.Read(cpu.Registers.SP)
+	cpu.Registers.SP++
+
+	return (uint16(high) << 8) | uint16(low)
 }
