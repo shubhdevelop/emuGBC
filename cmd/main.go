@@ -10,12 +10,17 @@ import (
 )
 
 func main() {
+	args := os.Args
 	fmt.Println("Powering on Game Boy...")
 	MMU := mmu.NewMMU()
 	PPU := ppu.NewPPU()
 	MMU.PPU = PPU
 
 	cpu := cpu.NewCPU(MMU)
+
+	if len(args) > 1 && args[1] == "bin" {
+		cpu.LogMode = "bin"
+	}
 
 	romData, err := os.ReadFile("roms/tetris.gb")
 	if err != nil {
@@ -32,6 +37,7 @@ func main() {
 	cpu.Registers.SetBC(0x0013)
 	cpu.Registers.SetDE(0x00D8)
 	cpu.Registers.SetHL(0x014D)
+
 	fmt.Println("Registers Setup done")
 	for {
 		cycles := cpu.Step()

@@ -13,6 +13,8 @@ type CPU struct {
 	// internal state
 	isHalted bool
 	IME      bool
+
+	LogMode string
 }
 
 type Opcode struct {
@@ -22,7 +24,8 @@ type Opcode struct {
 
 func NewCPU(bus *mmu.MMU) *CPU {
 	return &CPU{
-		Bus: bus,
+		Bus:     bus,
+		LogMode: "hex",
 	}
 }
 
@@ -40,14 +43,25 @@ func (cpu *CPU) FetchWord() uint16 {
 
 func (cpu *CPU) Log() {
 	// Print current state BEFORE executing the instruction
-	fmt.Printf("PC:%04X AF:%04X BC:%04X DE:%04X HL:%04X SP:%04X\n",
-		cpu.Registers.PC,
-		cpu.Registers.GetAF(),
-		cpu.Registers.GetBC(),
-		cpu.Registers.GetDE(),
-		cpu.Registers.GetHL(),
-		cpu.Registers.SP,
-	)
+	if cpu.LogMode == "hex" {
+		fmt.Printf("PC:0x%04X AF:0x%04X BC:0x%04X DE:0x%04X HL:0x%04X SP:0x%04X\n",
+			cpu.Registers.PC,
+			cpu.Registers.GetAF(),
+			cpu.Registers.GetBC(),
+			cpu.Registers.GetDE(),
+			cpu.Registers.GetHL(),
+			cpu.Registers.SP,
+		)
+	} else if cpu.LogMode == "bin" {
+		fmt.Printf("PC:%b AF:%b BC:%b DE:%b HL:%b SP:%b\n",
+			cpu.Registers.PC,
+			cpu.Registers.GetAF(),
+			cpu.Registers.GetBC(),
+			cpu.Registers.GetDE(),
+			cpu.Registers.GetHL(),
+			cpu.Registers.SP,
+		)
+	}
 }
 
 func (cpu *CPU) Push() {}
@@ -61,22 +75,23 @@ func (cpu *CPU) Step() int {
 		return 4
 	}
 
-	pc := cpu.Registers.PC
 	opcode := cpu.FetchByte() // advances PC by 1
 
 	// CB prefix
 	if opcode == 0xCB {
 		cb := cpu.FetchByte()
+		fmt.Printf("Current Opcode: 0x%02X\n", cb)
 		fn := cbOpcodes[cb].Fn
 		if fn == nil {
-			panic(fmt.Sprintf("Undefined CB opcode %02X at PC: %04X", cb, cpu.Registers.PC-1))
+			panic(fmt.Sprintf("Undefined CB opcode 0x%02X at PC: 0x%04X", cb, cpu.Registers.PC-1))
 		}
 		return fn(cpu)
 	}
 
+	fmt.Printf("Current Opcode: 0x%02X\n", opcode)
 	entry := mainOpcodes[opcode]
 	if entry.Fn == nil {
-		panic(fmt.Sprintf("Undefined opcode 0x%02X at PC: %04X", opcode, pc))
+		panic(fmt.Sprintf("Undefined opcode 0x%02X at PC: 0x%04X", opcode, cpu.Registers.PC))
 	}
 	return entry.Fn(cpu)
 }
