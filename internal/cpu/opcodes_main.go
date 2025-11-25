@@ -1,32 +1,34 @@
 package cpu
 
-import "fmt"
-
 var mainOpcodes = [256]Opcode{
+	// Arithematic
+	0x05: {Fn: (*CPU).InstrARITH_Dec_B, Mnemonic: "DEC B"},
+	0x0D: {Fn: (*CPU).InstrARITH_Dec_C, Mnemonic: "DEC C"},
+
 	// MOVE OPCODES
 	0x00: {Fn: (*CPU).InstrNop, Mnemonic: "NOP"},
-	0xCB: {Fn: (*CPU).InstrPrefixCB, Mnemonic: "PREFIX CB"},
+	// 0xCB: {Fn: (*CPU).InstrPrefixCB, Mnemonic: "PREFIX CB"}, Step function handles it
 	0x01: {Fn: (*CPU).InstrLD_BC_d16, Mnemonic: "LD BC, d16"},
-	0x02: {Fn: (*CPU).InstrLD_BC_A, Mnemonic: "LD (BC), A"},
+	0x02: {Fn: (*CPU).InstrLD_BC_ad_A, Mnemonic: "LD (BC), A"},
 	0x06: {Fn: (*CPU).InstrLD_B_d8, Mnemonic: "LD B, d8"},
 	0x08: {Fn: (*CPU).InstrLD_a16_SP, Mnemonic: "LD (a16), SP"},
-	0x0A: {Fn: (*CPU).InstrLD_A_BC, Mnemonic: "LD A, (BC)"},
+	0x0A: {Fn: (*CPU).InstrLD_A_BC_ad, Mnemonic: "LD A, (BC)"},
 	0x0E: {Fn: (*CPU).InstrLD_C_d8, Mnemonic: "LD C, d8"},
-	0x11: {Fn: (*CPU).InstrLD_DE_d16, Mnemonic: "LD DE, n16"},
-	0x12: {Fn: (*CPU).InstrLD_DE_A, Mnemonic: "LD [DE], A"},
-	0x16: {Fn: (*CPU).InstrLD_D_d8, Mnemonic: "LD D, n8"},
-	0x1A: {Fn: (*CPU).InstrLD_A_DE, Mnemonic: "LD A, [DE]"},
-	0x1E: {Fn: (*CPU).InstrLD_E_d8, Mnemonic: "LD E, n8"},
-	0x21: {},
-	0x22: {},
+	0x11: {Fn: (*CPU).InstrLD_DE_d16, Mnemonic: "LD DE, d16"},
+	0x12: {Fn: (*CPU).InstrLD_DE_ad_A, Mnemonic: "LD [DE], A"},
+	0x16: {Fn: (*CPU).InstrLD_D_d8, Mnemonic: "LD D, d8"},
+	0x1A: {Fn: (*CPU).InstrLD_A_DE_ad, Mnemonic: "LD A, [DE]"},
+	0x1E: {Fn: (*CPU).InstrLD_E_d8, Mnemonic: "LD E, d8"},
+	0x21: {Fn: (*CPU).InstrLD_HL_d16, Mnemonic: "LD HL, d16"},
+	0x22: {Fn: (*CPU).InstrLD_HL_ad_INC_A, Mnemonic: "LD (HL+), A"},
 	0x26: {},
 	0x2A: {},
 	0x2E: {},
-	0x31: {},
-	0x32: {},
+	0x31: {Fn: (*CPU).InstrLD_SP_d16, Mnemonic: "LD SP, d16"},
+	0x32: {Fn: (*CPU).InstrLD_HL_ad_DEC_A, Mnemonic: "LD (HL-), A"},
 	0x36: {},
 	0x3A: {},
-	0x3E: {},
+	0x3E: {Fn: (*CPU).InstrLD_A_d8, Mnemonic: "LD A d8"},
 	0x40: {},
 	0x41: {},
 	0x42: {},
@@ -87,11 +89,11 @@ var mainOpcodes = [256]Opcode{
 	0x7D: {},
 	0x7E: {},
 	0x7F: {},
-	0xE0: {},
-	0xE2: {},
+	0xE0: {Fn: (*CPU).InstrLDH_a8_ad_A, Mnemonic: "LD (a8) A"},
+	0xE2: {Fn: (*CPU).InstrLD_C_ad_A, Mnemonic: "LD (C) A"},
 	0xEA: {},
-	0xF0: {},
-	0xF2: {},
+	0xF0: {Fn: (*CPU).InstrLDH_A_a8, Mnemonic: "LD (a8) A"},
+	0xF2: {Fn: (*CPU).InstrLD_A_C_Ad, Mnemonic: "LD A (C)"},
 	0xFA: {},
 	// Move Instructions STACK:Pop
 	0xC1: {},
@@ -109,7 +111,7 @@ var mainOpcodes = [256]Opcode{
 	0xC2: {Fn: (*CPU).JumpAbsoluteZero, Mnemonic: "JP 16"},
 	0xD2: {Fn: (*CPU).JumpAbsoluteCarry, Mnemonic: "JP C a16"},
 	0xC3: {Fn: (*CPU).JumpAbsolute, Mnemonic: "JP a16"},
-	0xE9: {Fn: (*CPU).JumpAbsoluteHL, Mnemonic: "JP (HL)"},
+	0xE9: {Fn: (*CPU).JumpAbsoluteHL_ad, Mnemonic: "JP (HL)"},
 	// Move Instructions STACK:Push
 	0xC5: {},
 	0xD5: {},
@@ -118,6 +120,13 @@ var mainOpcodes = [256]Opcode{
 	// Misc
 	0xF8: {},
 	0xF9: {},
+	// Logical
+	0xAF: {Fn: (*CPU).InstructLOGIC_XOR_A, Mnemonic: "XOR A"},
+	// Control
+	0x10: {Fn: (*CPU).InstrCONT_STOP, Mnemonic: "STOP"},
+	0x76: {Fn: (*CPU).InstrCONT_HALT, Mnemonic: "HALT"},
+	0xF3: {Fn: (*CPU).InstrCONT_DI, Mnemonic: "DI"},
+	0xFB: {Fn: (*CPU).InstrCONT_EI, Mnemonic: "EI"},
 }
 
 /*
@@ -127,13 +136,4 @@ CYCLES: 4
 */
 func (cpu *CPU) InstrNop() int {
 	return 4
-}
-
-func (cpu *CPU) InstrPrefixCB() int {
-	cb := cpu.FetchByte()
-	fn := cbOpcodes[cb].Fn
-	if fn == nil {
-		panic(fmt.Sprintf("Undefined CB opcode %02X at PC: %04X", cb, cpu.Registers.PC-1))
-	}
-	return fn(cpu)
 }
