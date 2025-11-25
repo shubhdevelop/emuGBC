@@ -226,3 +226,52 @@ func (cpu *CPU) InstrLDH_A_a8() int {
 	cpu.Registers.A = value
 	return 12
 }
+
+/*
+OPCODE: 0x36
+DESCRIPTION: laad immediate 8-bits at address [HL]
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLD_HL_ad_d8() int {
+	addr := cpu.Registers.GetHL()
+	b := cpu.FetchByte()
+	cpu.Bus.Write(addr, b)
+	return 12
+}
+
+/*
+OPCODE: 0xEA
+DESCRIPTION: laad A into address a16
+CYCLE: 16
+*/
+func (cpu *CPU) InstrLD_a16_ad_A() int {
+	addr := cpu.FetchWord()
+	cpu.Bus.Write(addr, cpu.Registers.A)
+	return 16
+}
+
+/*
+OPCODE: 0x2A
+DESCRIPTION: laad address [HL] into A, increment HL
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_A_HL_ad_INC() int {
+	addr := cpu.Registers.GetHL()
+	b := cpu.Bus.Read(addr)
+	cpu.Registers.A = b
+	cpu.Registers.SetHL(addr + 1)
+	return 8
+}
+
+/*
+OPCODE: 0x2A
+DESCRIPTION: laad address [HL] into A, decrement HL
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_A_HL_ad_DEC() int {
+	addr := cpu.Registers.GetHL()
+	b := cpu.Bus.Read(addr)
+	cpu.Registers.A = b
+	cpu.Registers.SetHL(addr - 1)
+	return 8
+}
