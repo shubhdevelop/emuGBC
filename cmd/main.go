@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/shubhdevelop/emuGBC/internal/cpu"
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
-	"github.com/shubhdevelop/emuGBC/internal/ppu"
 )
 
 func main() {
@@ -13,66 +13,24 @@ func main() {
 	memoryBus := mmu.NewMMU()
 	cpu := cpu.NewCPU(memoryBus)
 
-	romData := []byte{
-		0x00,
-		0x01,
-		0x02,
-		0x06,
-		0x08,
-		0x0A,
-		0x0E,
-		0x11,
-		0x12,
-		0x16,
-		0x1A,
-		0x1E,
+	romData, err := os.ReadFile("roms/tetris.gb")
+	if err != nil {
+		panic(fmt.Sprintf("Failed to load ROM: %v", err))
 	}
 
 	cpu.Bus.LoadROM(romData)
 	fmt.Println("Starting execution...")
-
-	for range [10]int{} {
-		cpu.Step()
-	}
-
-	tileData := []byte{
-		0x3C, 0x7E, // Row 0
-		0x42, 0x42, // Row 1
-		0x42, 0x42, // Row 2
-		0x42, 0x42, // Row 3
-		0x7E, 0x7E, // Row 4
-		0x42, 0x42, // Row 5
-		0x42, 0x42, // Row 6
-		0x00, 0x00, // Row 7
-		0x3C, 0x7E, // Row 0
-		0x42, 0x42, // Row 1
-		0x42, 0x42, // Row 2
-		0x42, 0x42, // Row 3
-		0x7E, 0x7E, // Row 4
-		0x42, 0x42, // Row 5
-		0x42, 0x42, // Row 6
-		0x00, 0x00, // Row 7
-	}
-
-	// Decode it!
-	tile := ppu.DecodeTile(tileData)
-	fmt.Println("Decoded Tile (ASCII View):")
-	for y := range [8]int{} {
-		for x := range [8]int{} {
-			id := tile[y][x]
-
-			// Map IDs to characters so we can "see" the image
-			switch id {
-			case 0:
-				fmt.Print(". ") // White
-			case 1:
-				fmt.Print("- ") // Light Gray
-			case 2:
-				fmt.Print("+ ") // Dark Gray
-			case 3:
-				fmt.Print("# ") // Black
-			}
-		}
-		fmt.Println() // New line at end of row
+	fmt.Println("Setting up Registers...")
+	cpu.Registers.PC = 0x0100
+	cpu.Registers.SP = 0xFFFE
+	cpu.Registers.A = 0x01
+	cpu.Registers.F = 0xB0
+	cpu.Registers.SetBC(0x0013)
+	cpu.Registers.SetDE(0x00D8)
+	cpu.Registers.SetHL(0x014D)
+	fmt.Println("Registers Setup done")
+	for {
+		cycles := cpu.Step()
+		_ = cycles
 	}
 }
