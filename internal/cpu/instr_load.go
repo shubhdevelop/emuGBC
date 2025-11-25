@@ -275,3 +275,25 @@ func (cpu *CPU) InstrLD_A_HL_ad_DEC() int {
 	cpu.Registers.SetHL(addr - 1)
 	return 8
 }
+
+/*
+OPCODE: 0x26
+DESCRIPTION: laad immediate 8-bits into H
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_H_d8() int {
+	b := cpu.FetchByte()
+	cpu.Registers.H = b
+	return 8
+}
+
+/*
+OPCODE: 0x2E
+DESCRIPTION: llaad immediate 8-bits into L
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_L_d8() int {
+	b := cpu.FetchByte()
+	cpu.Registers.L = b
+	return 8
+}
