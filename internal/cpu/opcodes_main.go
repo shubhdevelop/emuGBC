@@ -143,6 +143,14 @@ var mainOpcodes = [256]Opcode{
 	// Logical
 	0xAF: {Fn: (*CPU).InstrLOGIC_XOR_A, Mnemonic: "XOR A"},
 	0xFE: {Fn: (*CPU).InstrLOGIC_CP_d8, Mnemonic: "CP d8"},
+	0xB8: {Fn: (*CPU).InstrLOGIC_CP_B, Mnemonic: "CP B"},
+	0xB9: {Fn: (*CPU).InstrLOGIC_CP_C, Mnemonic: "CP C"},
+	0xBA: {Fn: (*CPU).InstrLOGIC_CP_D, Mnemonic: "CP D"},
+	0xBB: {Fn: (*CPU).InstrLOGIC_CP_E, Mnemonic: "CP E"},
+	0xBC: {Fn: (*CPU).InstrLOGIC_CP_H, Mnemonic: "CP H"},
+	0xBD: {Fn: (*CPU).InstrLOGIC_CP_L, Mnemonic: "CP L"},
+	0xBE: {Fn: (*CPU).InstrLOGIC_CP_HL_ad, Mnemonic: "CP (HL)"},
+	0xBF: {Fn: (*CPU).InstrLOGIC_CP_A, Mnemonic: "CP A"},
 	// Control
 	0x10: {Fn: (*CPU).InstrCONT_STOP, Mnemonic: "STOP"},
 	0x76: {Fn: (*CPU).InstrCONT_HALT, Mnemonic: "HALT"},

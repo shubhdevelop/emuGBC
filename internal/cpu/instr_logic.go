@@ -4,16 +4,12 @@ func (cpu *CPU) cp(value byte) {
 	a := cpu.Registers.A
 	result := a - value
 
-	// Z flag: set if result == 0
 	cpu.Registers.SetFlag(FlagZ, (result == 0))
 
-	// N flag: always set (comparison is subtraction)
 	cpu.Registers.SetFlag(FlagZ, true)
 
-	// H flag: half-carry/borrow from bit 4
 	cpu.Registers.SetFlag(FlagH, halfCarrySub(a, value))
 
-	// C flag: full borrow
 	cpu.Registers.SetFlag(FlagH, carrySub(a, value))
 }
 
@@ -30,4 +26,46 @@ func (cpu *CPU) InstrLOGIC_CP_d8() int {
 	val := cpu.FetchByte()
 	cpu.cp(val)
 	return 8
+}
+func (cpu *CPU) InstrLOGIC_CP_B() int {
+	val := cpu.Registers.B
+	cpu.cp(val)
+	return 4
+}
+func (cpu *CPU) InstrLOGIC_CP_C() int {
+	val := cpu.Registers.C
+	cpu.cp(val)
+	return 4
+}
+
+func (cpu *CPU) InstrLOGIC_CP_D() int {
+	val := cpu.Registers.D
+	cpu.cp(val)
+	return 4
+}
+func (cpu *CPU) InstrLOGIC_CP_E() int {
+	val := cpu.Registers.E
+	cpu.cp(val)
+	return 4
+}
+func (cpu *CPU) InstrLOGIC_CP_H() int {
+	val := cpu.Registers.H
+	cpu.cp(val)
+	return 4
+}
+func (cpu *CPU) InstrLOGIC_CP_L() int {
+	val := cpu.Registers.L
+	cpu.cp(val)
+	return 4
+}
+func (cpu *CPU) InstrLOGIC_CP_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	cpu.cp(val)
+	return 8
+}
+func (cpu *CPU) InstrLOGIC_CP_A() int {
+	val := cpu.Registers.A
+	cpu.cp(val)
+	return 4
 }
