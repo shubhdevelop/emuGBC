@@ -60,7 +60,7 @@ func (cpu *CPU) Step() int {
 		cb := cpu.FetchByte() // advances PC by 1
 		entry := cbOpcodes[cb]
 		if entry.Fn == nil {
-			panic(fmt.Sprintf("Undefined CB opcode CB %02X at PC: %04X", cb, pc))
+			panic(fmt.Sprintf("Undefined CB opcode CB 0x%02X at PC: %04X", cb, pc))
 		}
 
 		return entry.Fn(cpu)
@@ -68,7 +68,7 @@ func (cpu *CPU) Step() int {
 
 	entry := mainOpcodes[opcode]
 	if entry.Fn == nil {
-		panic(fmt.Sprintf("Undefined opcode %02X at PC: %04X", opcode, pc))
+		panic(fmt.Sprintf("Undefined opcode 0x%02X at PC: %04X", opcode, pc))
 	}
 	return entry.Fn(cpu)
 }
