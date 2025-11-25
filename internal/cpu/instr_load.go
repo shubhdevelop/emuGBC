@@ -2,7 +2,7 @@ package cpu
 
 /*
 OPCODE: 0x01
-DESCRIPTION: Load 16 bits into BC
+DESCRIPTION: Load immediate 16-bit value into BC
 CYCLE: 12
 */
 func (cpu *CPU) InstrLD_BC_d16() int {
@@ -13,10 +13,10 @@ func (cpu *CPU) InstrLD_BC_d16() int {
 
 /*
 OPCODE: 0x02
-DESCRIPTION: Load A into BC
+DESCRIPTION: Load A into address [BC]
 CYCLE: 8
 */
-func (cpu *CPU) InstrLD_BC_A() int {
+func (cpu *CPU) InstrLD_BC_ad_A() int {
 	addr := cpu.Registers.GetBC()
 	cpu.Bus.Write(addr, cpu.Registers.A)
 	return 8
@@ -24,7 +24,7 @@ func (cpu *CPU) InstrLD_BC_A() int {
 
 /*
 OPCODE: 0x06
-DESCRIPTION: Load 8 bits into B
+DESCRIPTION: Load immediate 8-bits into B
 CYCLE: 8
 */
 func (cpu *CPU) InstrLD_B_d8() int {
@@ -50,7 +50,7 @@ OPCODE: 0x0A
 DESCRIPTION: SET A with [BC]
 CYCLE: 8
 */
-func (cpu *CPU) InstrLD_A_BC() int {
+func (cpu *CPU) InstrLD_A_BC_ad() int {
 	addr := cpu.Registers.GetBC() // 16-bit address
 	val := cpu.Bus.Read(addr)     // read 8-bit from memory
 	cpu.Registers.A = val         // load into A
@@ -59,7 +59,7 @@ func (cpu *CPU) InstrLD_A_BC() int {
 
 /*
 OPCODE: 0x0E
-DESCRIPTION: SET C with 8 bits
+DESCRIPTION: Load immediate 8-bit value into C
 CYCLE: 8
 */
 func (cpu *CPU) InstrLD_C_d8() int {
@@ -81,10 +81,10 @@ func (cpu *CPU) InstrLD_DE_d16() int {
 
 /*
 OPCODE: 0x12
-DESCRIPTION: SET [DE] with A
+DESCRIPTION: Store A into address (DE)
 CYCLE: 8
 */
-func (cpu *CPU) InstrLD_DE_A() int {
+func (cpu *CPU) InstrLD_DE_ad_A() int {
 	addr := cpu.Registers.GetDE()
 	val := cpu.Registers.A
 	cpu.Bus.Write(addr, val)
@@ -107,7 +107,7 @@ OPCODE: 0x1A
 DESCRIPTION: SET A with [DE]
 CYCLE: 8
 */
-func (cpu *CPU) InstrLD_A_DE() int {
+func (cpu *CPU) InstrLD_A_DE_ad() int {
 	addr := cpu.Registers.GetDE()
 	b := cpu.Bus.Read(addr)
 	cpu.Registers.A = b
@@ -116,11 +116,113 @@ func (cpu *CPU) InstrLD_A_DE() int {
 
 /*
 OPCODE: 0x1E
-DESCRIPTION: SET E with 8 bits
+DESCRIPTION:  Load immediate 8-bit value into C
 CYCLE: 8
 */
 func (cpu *CPU) InstrLD_E_d8() int {
 	b := cpu.FetchByte()
 	cpu.Registers.E = b
 	return 8
+}
+
+/*
+OPCODE: 0x21
+DESCRIPTION: SET HL with 16 bits
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLD_HL_d16() int {
+	w := cpu.FetchWord()
+	cpu.Registers.SetHL(w)
+	return 12
+}
+
+/*
+OPCODE: 0x31
+DESCRIPTION: Load immediate 16-bit value into SP
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLD_SP_d16() int {
+	w := cpu.FetchWord()
+	cpu.Registers.SP = w
+	return 12
+}
+
+/*
+OPCODE: 0x22
+DESCRIPTION: Store A at (HL), then increment HL
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_HL_ad_INC_A() int {
+	addr := cpu.Registers.GetHL()
+	cpu.Bus.Write(addr, cpu.Registers.A)
+	cpu.Registers.SetHL(addr + 1)
+	return 8
+}
+
+/*
+OPCODE: 0x32
+DESCRIPTION: Store A at (HL), then decrement HL
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_HL_ad_DEC_A() int {
+	addr := cpu.Registers.GetHL()
+	cpu.Bus.Write(addr, cpu.Registers.A)
+	cpu.Registers.SetHL(addr - 1)
+	return 8
+}
+
+/*
+OPCODE: 0x3E
+DESCRIPTION: SET A with 8 bits
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_A_d8() int {
+	b := cpu.FetchByte()
+	cpu.Registers.A = b
+	return 8
+}
+
+/*
+OPCODE: 0xE2
+DESCRIPTION: Store A into (0xFF00 + C)
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_C_ad_A() int {
+	addr := 0xFF00 + uint16(cpu.Registers.C)
+	cpu.Bus.Write(addr, cpu.Registers.A)
+	return 8
+}
+
+/*
+OPCODE: 0xF2
+DESCRIPTION: Load A from (0xFF00 + C)
+CYCLE: 8
+*/
+func (cpu *CPU) InstrLD_A_C_Ad() int {
+	addr := 0xFF00 + uint16(cpu.Registers.C)
+	cpu.Registers.A = cpu.Bus.Read(uint16(addr))
+	return 8
+}
+
+/*
+OPCODE: 0xE0
+DESCRIPTION: LDH (a8), A -> Load A into address 0xFF00 + n
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLDH_a8_ad_A() int {
+	addr := 0xFF00 + uint16(cpu.FetchByte())
+	cpu.Bus.Write(addr, cpu.Registers.A)
+	return 12
+}
+
+/*
+OPCODE: 0xF0
+DESCRIPTION: LDH A, (a8) -> Load value at 0xFF00 + (a8) into A
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLDH_A_a8() int {
+	addr := 0xFF00 + uint16(cpu.FetchByte())
+	value := cpu.Bus.Read(addr)
+	cpu.Registers.A = value
+	return 12
 }
