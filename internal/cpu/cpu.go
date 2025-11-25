@@ -9,6 +9,10 @@ import (
 type CPU struct {
 	Registers Registers
 	Bus       *mmu.MMU
+
+	// internal state
+	isHalted bool
+	IME      bool
 }
 
 type Opcode struct {
@@ -52,18 +56,22 @@ func (cpu *CPU) Pop()  {}
 // Step executes the next instruction
 func (cpu *CPU) Step() int {
 	cpu.Log()
+
+	if cpu.isHalted {
+		return 4
+	}
+
 	pc := cpu.Registers.PC
 	opcode := cpu.FetchByte() // advances PC by 1
 
 	// CB prefix
 	if opcode == 0xCB {
-		cb := cpu.FetchByte() // advances PC by 1
-		entry := cbOpcodes[cb]
-		if entry.Fn == nil {
-			panic(fmt.Sprintf("Undefined CB opcode CB 0x%02X at PC: %04X", cb, pc))
+		cb := cpu.FetchByte()
+		fn := cbOpcodes[cb].Fn
+		if fn == nil {
+			panic(fmt.Sprintf("Undefined CB opcode %02X at PC: %04X", cb, cpu.Registers.PC-1))
 		}
-
-		return entry.Fn(cpu)
+		return fn(cpu)
 	}
 
 	entry := mainOpcodes[opcode]

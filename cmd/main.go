@@ -6,12 +6,16 @@ import (
 
 	"github.com/shubhdevelop/emuGBC/internal/cpu"
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
+	"github.com/shubhdevelop/emuGBC/internal/ppu"
 )
 
 func main() {
 	fmt.Println("Powering on Game Boy...")
-	memoryBus := mmu.NewMMU()
-	cpu := cpu.NewCPU(memoryBus)
+	MMU := mmu.NewMMU()
+	PPU := ppu.NewPPU()
+	MMU.PPU = PPU
+
+	cpu := cpu.NewCPU(MMU)
 
 	romData, err := os.ReadFile("roms/tetris.gb")
 	if err != nil {
