@@ -43,10 +43,12 @@ func (cpu *CPU) Or_A(value uint8) {
 	cpu.Registers.SetFlag(FlagC, false)
 }
 
-func (cpu *CPU) Xor_A(value uint8) {
-	cpu.Registers.A ^= value
-	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0)
-	cpu.Registers.SetFlag(FlagN, false)
-	cpu.Registers.SetFlag(FlagH, false)
-	cpu.Registers.SetFlag(FlagC, false)
+func (cpu *CPU) InstrARITH_Dec_B() int {
+	cpu.Registers.A -= 1
+	return 4
+}
+
+func (cpu *CPU) InstrARITH_Dec_C() int {
+	cpu.Registers.C -= 1
+	return 4
 }

@@ -46,7 +46,7 @@ func (cpu *CPU) JumpAbsoluteCarry() int {
 	}
 }
 
-func (cpu *CPU) JumpAbsoluteHL() int {
+func (cpu *CPU) JumpAbsoluteHL_ad() int {
 	target := cpu.Registers.GetHL()
 	cpu.Registers.PC = target
 	return 4
