@@ -21,3 +21,20 @@ func (r *Registers) SetFlag(flag uint8, value bool) {
 		r.F &^= flag
 	}
 }
+
+func halfCarrySub(a, b byte) bool {
+	return (a & 0x0F) < (b & 0x0F)
+}
+
+func carrySub(a, b byte) bool {
+	return a < b
+}
+
+
+func halfCarryAdd(a, b byte) bool {
+	return (a&0x0f)+(b&0x0f) > 0x0f
+}
+
+func carryAdd(a, b byte) bool {
+	return uint16(a) + uint16(b) > 0xFF
+}

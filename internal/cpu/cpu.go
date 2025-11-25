@@ -43,7 +43,8 @@ func (cpu *CPU) FetchWord() uint16 {
 
 func (cpu *CPU) Log() {
 	// Print current state BEFORE executing the instruction
-	if cpu.LogMode == "hex" {
+	switch cpu.LogMode {
+	case "hex":
 		fmt.Printf("PC:0x%04X AF:0x%04X BC:0x%04X DE:0x%04X HL:0x%04X SP:0x%04X\n",
 			cpu.Registers.PC,
 			cpu.Registers.GetAF(),
@@ -52,7 +53,7 @@ func (cpu *CPU) Log() {
 			cpu.Registers.GetHL(),
 			cpu.Registers.SP,
 		)
-	} else if cpu.LogMode == "bin" {
+	case "bin":
 		fmt.Printf("PC:%b AF:%b BC:%b DE:%b HL:%b SP:%b\n",
 			cpu.Registers.PC,
 			cpu.Registers.GetAF(),

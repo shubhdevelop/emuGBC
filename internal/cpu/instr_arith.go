@@ -1,9 +1,9 @@
 package cpu
 
 func (cpu *CPU) Add_A(value uint8) {
-	isHalfCarry := (cpu.Registers.A&0x0f)+(value&0x0f) > 0x0f
+	isHalfCarry := halfCarryAdd(cpu.Registers.A, value)
 	sum16 := uint16(cpu.Registers.A) + uint16(value)
-	isCarry := sum16 > 0xFF
+	isCarry := carryAdd(cpu.Registers.A, value)
 	cpu.Registers.A = uint8(sum16)
 	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0) // Set Z if result is 0
 	cpu.Registers.SetFlag(FlagN, false)                // Reset N (this is add, not sub)
@@ -12,8 +12,8 @@ func (cpu *CPU) Add_A(value uint8) {
 }
 
 func (cpu *CPU) Sub_A(value uint8) {
-	isHalfCarry := (cpu.Registers.A & 0x0f) < (value & 0x0f)
-	isCarry := cpu.Registers.A < value
+	isHalfCarry := halfCarrySub(cpu.Registers.A, value)
+	isCarry := carrySub(cpu.Registers.A, value)
 	cpu.Registers.A -= value
 	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0)
 	cpu.Registers.SetFlag(FlagN, true)
