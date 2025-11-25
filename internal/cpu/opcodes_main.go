@@ -4,19 +4,19 @@ import "fmt"
 
 var mainOpcodes = [256]Opcode{
 	// MOVE OPCODES
-	0x00: {Fn: (*CPU).InstrNop, Cycles: 4, Mnemonic: "NOP"},
-	0xCB: {Fn: (*CPU).InstrPrefixCB, Cycles: 4, Mnemonic: "PREFIX CB"},
-	0x01: {Fn: (*CPU).InstrLD_BC_d16, Cycles: 12, Mnemonic: "LD BC, d16"},
-	0x02: {Fn: (*CPU).InstrLD_BC_A, Cycles: 8, Mnemonic: "LD (BC), A"},
-	0x06: {Fn: (*CPU).InstrLD_B_d8, Cycles: 8, Mnemonic: "LD B, d8"},
-	0x08: {Fn: (*CPU).InstrLD_a16_SP, Cycles: 20, Mnemonic: "LD (a16), SP"},
-	0x0A: {Fn: (*CPU).InstrLD_A_BC, Cycles: 8, Mnemonic: "LD A, (BC)"},
-	0x0E: {Fn: (*CPU).InstrLD_C_d8, Cycles: 8, Mnemonic: "LD C, d8"},
-	0x11: {Fn: (*CPU).InstrLD_DE_d16, Cycles: 8, Mnemonic: "LD DE, n16"},
-	0x12: {Fn: (*CPU).InstrLD_DE_A, Cycles: 8, Mnemonic: "LD [DE], A"},
-	0x16: {Fn: (*CPU).InstrLD_D_d8, Cycles: 8, Mnemonic: "LD D, n8"},
-	0x1A: {Fn: (*CPU).InstrLD_A_DE, Cycles: 8, Mnemonic: "LD A, [DE]"},
-	0x1E: {Fn: (*CPU).InstrLD_E_d8, Cycles: 8, Mnemonic: "LD E, n8"},
+	0x00: {Fn: (*CPU).InstrNop, Mnemonic: "NOP"},
+	0xCB: {Fn: (*CPU).InstrPrefixCB, Mnemonic: "PREFIX CB"},
+	0x01: {Fn: (*CPU).InstrLD_BC_d16, Mnemonic: "LD BC, d16"},
+	0x02: {Fn: (*CPU).InstrLD_BC_A, Mnemonic: "LD (BC), A"},
+	0x06: {Fn: (*CPU).InstrLD_B_d8, Mnemonic: "LD B, d8"},
+	0x08: {Fn: (*CPU).InstrLD_a16_SP, Mnemonic: "LD (a16), SP"},
+	0x0A: {Fn: (*CPU).InstrLD_A_BC, Mnemonic: "LD A, (BC)"},
+	0x0E: {Fn: (*CPU).InstrLD_C_d8, Mnemonic: "LD C, d8"},
+	0x11: {Fn: (*CPU).InstrLD_DE_d16, Mnemonic: "LD DE, n16"},
+	0x12: {Fn: (*CPU).InstrLD_DE_A, Mnemonic: "LD [DE], A"},
+	0x16: {Fn: (*CPU).InstrLD_D_d8, Mnemonic: "LD D, n8"},
+	0x1A: {Fn: (*CPU).InstrLD_A_DE, Mnemonic: "LD A, [DE]"},
+	0x1E: {Fn: (*CPU).InstrLD_E_d8, Mnemonic: "LD E, n8"},
 	0x21: {},
 	0x22: {},
 	0x26: {},
@@ -98,6 +98,18 @@ var mainOpcodes = [256]Opcode{
 	0xD1: {},
 	0xE1: {},
 	0xF1: {},
+	//Jumps
+	0x20: {Fn: (*CPU).JumpRelativeNotZero, Mnemonic: "JR NZ, r8"},
+	0x30: {Fn: (*CPU).JumpRelativeNotCarry, Mnemonic: "JR NC, r8"},
+	0x28: {Fn: (*CPU).JumpRelativeZero, Mnemonic: "JR Z, r8"},
+	0x38: {Fn: (*CPU).JumpRelativeCarry, Mnemonic: "JR C, r8"},
+	0x18: {Fn: (*CPU).JumpRelative, Mnemonic: "JR r8"},
+	0xCA: {Fn: (*CPU).JumpAbsoluteNotZero, Mnemonic: "JP NZ a16"},
+	0xDA: {Fn: (*CPU).JumpAbsoluteNotCarry, Mnemonic: "JP NC a16"},
+	0xC2: {Fn: (*CPU).JumpAbsoluteZero, Mnemonic: "JP 16"},
+	0xD2: {Fn: (*CPU).JumpAbsoluteCarry, Mnemonic: "JP C a16"},
+	0xC3: {Fn: (*CPU).JumpAbsolute, Mnemonic: "JP a16"},
+	0xE9: {Fn: (*CPU).JumpAbsoluteHL, Mnemonic: "JP (HL)"},
 	// Move Instructions STACK:Push
 	0xC5: {},
 	0xD5: {},
@@ -113,13 +125,15 @@ OPCODE: 0x00
 DESCRIPTION: No operation
 CYCLES: 4
 */
-func (cpu *CPU) InstrNop() {}
+func (cpu *CPU) InstrNop() int {
+	return 4
+}
 
-func (cpu *CPU) InstrPrefixCB() {
+func (cpu *CPU) InstrPrefixCB() int {
 	cb := cpu.FetchByte()
 	fn := cbOpcodes[cb].Fn
 	if fn == nil {
 		panic(fmt.Sprintf("Undefined CB opcode %02X at PC: %04X", cb, cpu.Registers.PC-1))
 	}
-	fn(cpu)
+	return fn(cpu)
 }

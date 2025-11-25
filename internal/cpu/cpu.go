@@ -12,8 +12,7 @@ type CPU struct {
 }
 
 type Opcode struct {
-	Fn       func(*CPU)
-	Cycles   int
+	Fn       func(*CPU) int
 	Mnemonic string
 }
 
@@ -47,6 +46,9 @@ func (cpu *CPU) Log() {
 	)
 }
 
+func (cpu *CPU) Push() {}
+func (cpu *CPU) Pop()  {}
+
 // Step executes the next instruction
 func (cpu *CPU) Step() int {
 	cpu.Log()
@@ -60,14 +62,13 @@ func (cpu *CPU) Step() int {
 		if entry.Fn == nil {
 			panic(fmt.Sprintf("Undefined CB opcode CB %02X at PC: %04X", cb, pc))
 		}
-		entry.Fn(cpu)
-		return entry.Cycles
+
+		return entry.Fn(cpu)
 	}
 
 	entry := mainOpcodes[opcode]
 	if entry.Fn == nil {
 		panic(fmt.Sprintf("Undefined opcode %02X at PC: %04X", opcode, pc))
 	}
-	entry.Fn(cpu)
-	return entry.Cycles
+	return entry.Fn(cpu)
 }
