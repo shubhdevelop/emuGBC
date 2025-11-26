@@ -297,3 +297,13 @@ func (cpu *CPU) InstrLD_L_d8() int {
 	cpu.Registers.L = b
 	return 8
 }
+
+/*
+OPCODE: 0x78
+DESCRIPTION: laad A with B
+CYCLE: 4
+*/
+func (cpu *CPU) InstrLD_A_B() int {
+	cpu.Registers.A = cpu.Registers.B
+	return 8
+}
