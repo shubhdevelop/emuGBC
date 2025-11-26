@@ -163,34 +163,37 @@ var mainOpcodes = [256]Opcode{
 	0x9F: {},
 
 	// AND
-	0xA0: {},
-	0xA1: {},
-	0xA2: {},
-	0xA3: {},
-	0xA4: {},
-	0xA5: {},
-	0xA6: {},
-	0xA7: {},
+	0xA0: {Fn: (*CPU).InstrLOGIC_AND_B, Mnemonic: "AND B"},
+	0xA1: {Fn: (*CPU).InstrLOGIC_AND_C, Mnemonic: "AND C"},
+	0xA2: {Fn: (*CPU).InstrLOGIC_AND_D, Mnemonic: "AND D"},
+	0xA3: {Fn: (*CPU).InstrLOGIC_AND_E, Mnemonic: "AND E"},
+	0xA4: {Fn: (*CPU).InstrLOGIC_AND_H, Mnemonic: "AND H"},
+	0xA5: {Fn: (*CPU).InstrLOGIC_AND_L, Mnemonic: "AND L"},
+	0xA6: {Fn: (*CPU).InstrLOGIC_AND_HL_ad, Mnemonic: "AND (HL)"}, // return 8
+	0xA7: {Fn: (*CPU).InstrLOGIC_AND_A, Mnemonic: "AND A"},
+	0xE6: {Fn: (*CPU).InstrLOGIC_AND_d8, Mnemonic: "AND d8"},
 
 	// XOR
-	0xA8: {},
-	0xA9: {},
-	0xAA: {},
-	0xAB: {},
-	0xAC: {},
-	0xAD: {},
-	0xAE: {},
+	0xA8: {Fn: (*CPU).InstrLOGIC_XOR_B, Mnemonic: "XOR B"},
+	0xA9: {Fn: (*CPU).InstrLOGIC_XOR_C, Mnemonic: "XOR C"},
+	0xAA: {Fn: (*CPU).InstrLOGIC_XOR_D, Mnemonic: "XOR D"},
+	0xAB: {Fn: (*CPU).InstrLOGIC_XOR_E, Mnemonic: "XOR E"},
+	0xAC: {Fn: (*CPU).InstrLOGIC_XOR_H, Mnemonic: "XOR H"},
+	0xAD: {Fn: (*CPU).InstrLOGIC_XOR_L, Mnemonic: "XOR L"},
+	0xAE: {Fn: (*CPU).InstrLOGIC_XOR_HL_ad, Mnemonic: "XOR (HL)"}, // return 8
 	0xAF: {Fn: (*CPU).InstrLOGIC_XOR_A, Mnemonic: "XOR A"},
+	0xEE: {Fn: (*CPU).InstrLOGIC_XOR_d8, Mnemonic: "XOR d8"},
 
 	// OR
-	0xB0: {},
-	0xB1: {},
-	0xB2: {},
-	0xB3: {},
-	0xB4: {},
-	0xB5: {},
-	0xB6: {},
-	0xB7: {},
+	0xB0: {Fn: (*CPU).InstrLOGIC_OR_B, Mnemonic: "OR B"},
+	0xB1: {Fn: (*CPU).InstrLOGIC_OR_C, Mnemonic: "OR C"},
+	0xB2: {Fn: (*CPU).InstrLOGIC_OR_D, Mnemonic: "OR D"},
+	0xB3: {Fn: (*CPU).InstrLOGIC_OR_E, Mnemonic: "OR E"},
+	0xB4: {Fn: (*CPU).InstrLOGIC_OR_H, Mnemonic: "OR H"},
+	0xB5: {Fn: (*CPU).InstrLOGIC_OR_L, Mnemonic: "OR L"},
+	0xB6: {Fn: (*CPU).InstrLOGIC_OR_HL_ad, Mnemonic: "OR (HL)"}, // return 8
+	0xB7: {Fn: (*CPU).InstrLOGIC_OR_A, Mnemonic: "OR A"},
+	0xF6: {Fn: (*CPU).InstrLOGIC_OR_d8, Mnemonic: "OR d8"},
 
 	//CP
 	0xB8: {Fn: (*CPU).InstrLOGIC_CP_B, Mnemonic: "CP B"},
@@ -199,7 +202,7 @@ var mainOpcodes = [256]Opcode{
 	0xBB: {Fn: (*CPU).InstrLOGIC_CP_E, Mnemonic: "CP E"},
 	0xBC: {Fn: (*CPU).InstrLOGIC_CP_H, Mnemonic: "CP H"},
 	0xBD: {Fn: (*CPU).InstrLOGIC_CP_L, Mnemonic: "CP L"},
-	0xBE: {Fn: (*CPU).InstrLOGIC_CP_HL_ad, Mnemonic: "CP (HL)"},
+	0xBE: {Fn: (*CPU).InstrLOGIC_CP_HL_ad, Mnemonic: "CP (HL)"}, // return 8
 	0xBF: {Fn: (*CPU).InstrLOGIC_CP_A, Mnemonic: "CP A"},
 	0xFE: {Fn: (*CPU).InstrLOGIC_CP_d8, Mnemonic: "CP d8"},
 
