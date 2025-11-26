@@ -5,9 +5,8 @@ var mainOpcodes = [256]Opcode{
 	// 0x05: {Fn: (*CPU).InstrARITH_Dec_B, Mnemonic: "DEC B"},
 	// 0x0D: {Fn: (*CPU).InstrARITH_Dec_C, Mnemonic: "DEC C"},
 
-	// MOVE OPCODES
+	// LOAD OPCODES
 	0x00: {Fn: (*CPU).InstrNop, Mnemonic: "NOP"},
-	// 0xCB: {Fn: (*CPU).InstrPrefixCB, Mnemonic: "PREFIX CB"}, Step function handles it
 	0x01: {Fn: (*CPU).InstrLD_BC_d16, Mnemonic: "LD BC, d16"},
 	0x02: {Fn: (*CPU).InstrLD_BC_ad_A, Mnemonic: "LD (BC), A"},
 	0x06: {Fn: (*CPU).InstrLD_B_d8, Mnemonic: "LD B, d8"},
@@ -96,6 +95,7 @@ var mainOpcodes = [256]Opcode{
 	0xF8: {},
 	0xF9: {},
 	0xFA: {},
+
 	//Inc / Dec
 	0x03: {Fn: (*CPU).INC_BC, Mnemonic: "INC BC"},
 	0x13: {Fn: (*CPU).INC_DE, Mnemonic: "INC DE"},
@@ -121,6 +121,7 @@ var mainOpcodes = [256]Opcode{
 	0x1D: {Fn: (*CPU).DEC_E, Mnemonic: "DEC E"},
 	0x2D: {Fn: (*CPU).DEC_L, Mnemonic: "DEC L"},
 	0x3D: {Fn: (*CPU).DEC_A, Mnemonic: "DEC A"},
+
 	// ADD
 	0x80: {},
 	0x81: {},
@@ -130,6 +131,7 @@ var mainOpcodes = [256]Opcode{
 	0x85: {},
 	0x86: {},
 	0x87: {},
+
 	// ADC
 	0x88: {},
 	0x89: {},
@@ -139,6 +141,7 @@ var mainOpcodes = [256]Opcode{
 	0x8D: {},
 	0x8E: {},
 	0x8F: {},
+
 	// SUB
 	0x90: {},
 	0x91: {},
@@ -148,6 +151,7 @@ var mainOpcodes = [256]Opcode{
 	0x95: {},
 	0x96: {},
 	0x97: {},
+
 	// SBC
 	0x98: {},
 	0x99: {},
@@ -157,6 +161,7 @@ var mainOpcodes = [256]Opcode{
 	0x9D: {},
 	0x9E: {},
 	0x9F: {},
+
 	// AND
 	0xA0: {},
 	0xA1: {},
@@ -166,6 +171,7 @@ var mainOpcodes = [256]Opcode{
 	0xA5: {},
 	0xA6: {},
 	0xA7: {},
+
 	// XOR
 	0xA8: {},
 	0xA9: {},
@@ -175,6 +181,7 @@ var mainOpcodes = [256]Opcode{
 	0xAD: {},
 	0xAE: {},
 	0xAF: {Fn: (*CPU).InstrLOGIC_XOR_A, Mnemonic: "XOR A"},
+
 	// OR
 	0xB0: {},
 	0xB1: {},
@@ -184,6 +191,7 @@ var mainOpcodes = [256]Opcode{
 	0xB5: {},
 	0xB6: {},
 	0xB7: {},
+
 	//CP
 	0xB8: {Fn: (*CPU).InstrLOGIC_CP_B, Mnemonic: "CP B"},
 	0xB9: {Fn: (*CPU).InstrLOGIC_CP_C, Mnemonic: "CP C"},
@@ -194,6 +202,7 @@ var mainOpcodes = [256]Opcode{
 	0xBE: {Fn: (*CPU).InstrLOGIC_CP_HL_ad, Mnemonic: "CP (HL)"},
 	0xBF: {Fn: (*CPU).InstrLOGIC_CP_A, Mnemonic: "CP A"},
 	0xFE: {Fn: (*CPU).InstrLOGIC_CP_d8, Mnemonic: "CP d8"},
+
 	// Move Instructions STACK:Pop
 	0xC1: {Fn: (*CPU).InstrSTACK_POP_BC, Mnemonic: "POP BC"},
 	0xC5: {Fn: (*CPU).InstrSTACK_PUSH_BC, Mnemonic: "PUSH BC"},
@@ -203,6 +212,7 @@ var mainOpcodes = [256]Opcode{
 	0xE5: {Fn: (*CPU).InstrSTACK_PUSH_HL, Mnemonic: "PUSH HL"},
 	0xF1: {Fn: (*CPU).InstrSTACK_POP_AF, Mnemonic: "POP AF"},
 	0xF5: {Fn: (*CPU).InstrSTACK_PUSH_AF, Mnemonic: "PUSH AF"},
+
 	//Jumps
 	0x20: {Fn: (*CPU).JumpRelativeNotZero, Mnemonic: "JR NZ, r8"},
 	0x30: {Fn: (*CPU).JumpRelativeNotCarry, Mnemonic: "JR NC, r8"},
@@ -215,6 +225,7 @@ var mainOpcodes = [256]Opcode{
 	0xD2: {Fn: (*CPU).JumpAbsoluteCarry, Mnemonic: "JP C a16"},
 	0xC3: {Fn: (*CPU).JumpAbsolute, Mnemonic: "JP a16"},
 	0xE9: {Fn: (*CPU).JumpAbsoluteHL_ad, Mnemonic: "JP (HL)"},
+
 	// RET
 	0xC0: {Fn: (*CPU).RET_NZ, Mnemonic: "RET_NZ"},
 	0xD0: {Fn: (*CPU).RET_NC, Mnemonic: "RET NC"},
@@ -222,12 +233,14 @@ var mainOpcodes = [256]Opcode{
 	0xD8: {Fn: (*CPU).RET_C, Mnemonic: "RET C"},
 	0xC9: {Fn: (*CPU).RET, Mnemonic: "RET"},
 	0xD9: {Fn: (*CPU).RETI, Mnemonic: "RETI"},
+
 	// CALL
 	0xC4: {Fn: (*CPU).CALL_NZ, Mnemonic: "CALL_NZ"},
 	0xD4: {Fn: (*CPU).CALL_NC, Mnemonic: "CALL_NC"},
 	0xCC: {Fn: (*CPU).CALL_Z, Mnemonic: "CALL_Z"},
 	0xDC: {Fn: (*CPU).CALL_C, Mnemonic: "CALL_C"},
 	0xCD: {Fn: (*CPU).CALL, Mnemonic: "CALL"},
+
 	// RST
 	0xC7: {Fn: (*CPU).RST_00H, Mnemonic: "RST_00H"},
 	0xD7: {Fn: (*CPU).RST_10H, Mnemonic: "RST_10H"},
