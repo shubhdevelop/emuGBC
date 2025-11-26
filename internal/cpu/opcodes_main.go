@@ -2,8 +2,8 @@ package cpu
 
 var mainOpcodes = [256]Opcode{
 	// Arithematic
-	0x05: {Fn: (*CPU).InstrARITH_Dec_B, Mnemonic: "DEC B"},
-	0x0D: {Fn: (*CPU).InstrARITH_Dec_C, Mnemonic: "DEC C"},
+	// 0x05: {Fn: (*CPU).InstrARITH_Dec_B, Mnemonic: "DEC B"},
+	// 0x0D: {Fn: (*CPU).InstrARITH_Dec_C, Mnemonic: "DEC C"},
 
 	// MOVE OPCODES
 	0x00: {Fn: (*CPU).InstrNop, Mnemonic: "NOP"},
@@ -96,6 +96,31 @@ var mainOpcodes = [256]Opcode{
 	0xF8: {},
 	0xF9: {},
 	0xFA: {},
+	//Inc / Dec
+	0x03: {Fn: (*CPU).INC_BC, Mnemonic: "INC BC"},
+	0x13: {Fn: (*CPU).INC_DE, Mnemonic: "INC DE"},
+	0x23: {Fn: (*CPU).INC_HL, Mnemonic: "INC HL"},
+	0x33: {Fn: (*CPU).INC_SP, Mnemonic: "INC SP"},
+	0x04: {Fn: (*CPU).INC_B, Mnemonic: "INC B"},
+	0x14: {Fn: (*CPU).INC_D, Mnemonic: "INC D"},
+	0x24: {Fn: (*CPU).INC_H, Mnemonic: "INC H"},
+	0x34: {Fn: (*CPU).INC_HL_ad, Mnemonic: "INC (HL)"},
+	0x05: {Fn: (*CPU).DEC_B, Mnemonic: "DEC B"},
+	0x15: {Fn: (*CPU).DEC_D, Mnemonic: "DEC D"},
+	0x25: {Fn: (*CPU).DEC_H, Mnemonic: "DEC H"},
+	0x35: {Fn: (*CPU).DEC_HL_ad, Mnemonic: "DEC (HL)"},
+	0x0B: {Fn: (*CPU).DEC_BC, Mnemonic: "DEC BC"},
+	0x1B: {Fn: (*CPU).DEC_DE, Mnemonic: "DEC DE"},
+	0x2B: {Fn: (*CPU).DEC_HL, Mnemonic: "DEC HL"},
+	0x3B: {Fn: (*CPU).DEC_SP, Mnemonic: "DEC SP"},
+	0x0C: {Fn: (*CPU).INC_C, Mnemonic: "INC C"},
+	0x1C: {Fn: (*CPU).INC_E, Mnemonic: "INC E"},
+	0x2C: {Fn: (*CPU).INC_L, Mnemonic: "INC L"},
+	0x3C: {Fn: (*CPU).INC_A, Mnemonic: "INC A"},
+	0x0D: {Fn: (*CPU).DEC_C, Mnemonic: "DEC C"},
+	0x1D: {Fn: (*CPU).DEC_E, Mnemonic: "DEC E"},
+	0x2D: {Fn: (*CPU).DEC_L, Mnemonic: "DEC L"},
+	0x3D: {Fn: (*CPU).DEC_A, Mnemonic: "DEC A"},
 	// Move Instructions STACK:Pop
 	0xC1: {Fn: (*CPU).InstrSTACK_POP_BC, Mnemonic: "POP BC"},
 	0xC5: {Fn: (*CPU).InstrSTACK_PUSH_BC, Mnemonic: "PUSH BC"},
