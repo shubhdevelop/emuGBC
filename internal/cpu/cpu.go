@@ -66,8 +66,8 @@ func (cpu *CPU) Log() {
 }
 
 // Step executes the next instruction
-func (cpu *CPU) Step() int {
-	cpu.Log()
+func (cpu *CPU) Step() uint8 {
+	// cpu.Log()
 
 	if cpu.isHalted {
 		return 4
@@ -79,19 +79,17 @@ func (cpu *CPU) Step() int {
 	if opcode == 0xCB {
 		cb := cpu.FetchByte()
 		entry := cbOpcodes[cb]
-		fmt.Printf("Current CB Opcode: 0x%02X Mnemonic: %s \n", opcode, entry.Mnemonic)
 		if entry.Fn == nil {
 			panic(fmt.Sprintf("Undefined CB opcode 0x%02X at PC: 0x%04X", cb, cpu.Registers.PC-1))
 		}
-		return entry.Fn(cpu)
+		return uint8(entry.Fn(cpu))
 	}
 
 	entry := mainOpcodes[opcode]
-	fmt.Printf("Current Opcode: 0x%02X Mnemonic: %s \n", opcode, entry.Mnemonic)
 	if entry.Fn == nil {
 		panic(fmt.Sprintf("Undefined opcode 0x%02X at PC: 0x%04X", opcode, cpu.Registers.PC))
 	}
-	return entry.Fn(cpu)
+	return uint8(entry.Fn(cpu))
 }
 
 func (cpu *CPU) Push(val uint16) {

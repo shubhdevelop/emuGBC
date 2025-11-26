@@ -7,6 +7,7 @@ import (
 	"github.com/shubhdevelop/emuGBC/internal/cpu"
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
 	"github.com/shubhdevelop/emuGBC/internal/ppu"
+	"github.com/shubhdevelop/emuGBC/internal/timer"
 )
 
 func main() {
@@ -14,7 +15,9 @@ func main() {
 	fmt.Println("Powering on Game Boy...")
 	MMU := mmu.NewMMU()
 	PPU := ppu.NewPPU()
+	Timer := timer.NewTimer()
 	MMU.PPU = PPU
+	MMU.Timer = Timer
 
 	cpu := cpu.NewCPU(MMU)
 
@@ -41,6 +44,8 @@ func main() {
 	fmt.Println("Registers Setup done")
 	for {
 		cycles := cpu.Step()
+		PPU.Tick(uint8(cycles))
+		Timer.Tick(uint8(cycles))
 		_ = cycles
 	}
 }
