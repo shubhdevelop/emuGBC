@@ -64,12 +64,13 @@ func (cpu *CPU) JumpRelative() int {
 }
 
 func (cpu *CPU) JumpRelativeNotZero() int {
-	offset := int8(cpu.Bus.Read(cpu.Registers.PC))
-	cpu.Registers.PC++
-
-	// 2. Check the condition
+	offset := int8(cpu.FetchByte())
+	// 2. Check Condition
 	if !cpu.Registers.GetFlag(FlagZ) {
-		cpu.Registers.PC = uint16(int16(offset))
+		currentPC := int32(cpu.Registers.PC)
+		jump := int32(offset)
+		cpu.Registers.PC = uint16(currentPC + jump)
+
 		return 12
 	} else {
 		return 8
@@ -77,12 +78,13 @@ func (cpu *CPU) JumpRelativeNotZero() int {
 }
 
 func (cpu *CPU) JumpRelativeNotCarry() int {
-	offset := int8(cpu.Bus.Read(cpu.Registers.PC))
-	cpu.Registers.PC++
+	offset := int8(cpu.FetchByte())
 
-	// 2. Check the condition
 	if !cpu.Registers.GetFlag(FlagC) {
-		cpu.Registers.PC = uint16(int16(offset))
+		currentPC := int32(cpu.Registers.PC)
+		jump := int32(offset)
+		cpu.Registers.PC = uint16(currentPC + jump)
+
 		return 12
 	} else {
 		return 8
@@ -90,12 +92,12 @@ func (cpu *CPU) JumpRelativeNotCarry() int {
 }
 
 func (cpu *CPU) JumpRelativeZero() int {
-	offset := int8(cpu.Bus.Read(cpu.Registers.PC))
-	cpu.Registers.PC++
-
-	// 2. Check the condition
+	offset := int8(cpu.FetchByte())
 	if cpu.Registers.GetFlag(FlagZ) {
-		cpu.Registers.PC = uint16(int16(offset))
+		currentPC := int32(cpu.Registers.PC)
+		jump := int32(offset)
+		cpu.Registers.PC = uint16(currentPC + jump)
+
 		return 12
 	} else {
 		return 8
@@ -103,12 +105,12 @@ func (cpu *CPU) JumpRelativeZero() int {
 }
 
 func (cpu *CPU) JumpRelativeCarry() int {
-	offset := int8(cpu.Bus.Read(cpu.Registers.PC))
-	cpu.Registers.PC++
-
-	// 2. Check the condition
+	offset := int8(cpu.FetchByte())
 	if cpu.Registers.GetFlag(FlagC) {
-		cpu.Registers.PC = uint16(int16(offset))
+		currentPC := int32(cpu.Registers.PC)
+		jump := int32(offset)
+		cpu.Registers.PC = uint16(currentPC + jump)
+
 		return 12
 	} else {
 		return 8
