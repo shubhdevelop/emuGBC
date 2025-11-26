@@ -1,6 +1,9 @@
 package mmu
 
-import "github.com/shubhdevelop/emuGBC/internal/ppu"
+import (
+	"github.com/shubhdevelop/emuGBC/internal/ppu"
+	"github.com/shubhdevelop/emuGBC/internal/timer"
+)
 
 type MMU struct {
 	// Represents the entire 64KB address space
@@ -9,8 +12,9 @@ type MMU struct {
 	// GBC VRAM: 2 Banks, each 8KB (0x2000 bytes)
 	// Bank 0: Standard Data
 	// Bank 1: Attributes & Extra Data
-	vram [2][0x2000]uint8
-	PPU  *ppu.PPU
+	vram  [2][0x2000]uint8
+	PPU   *ppu.PPU
+	Timer *timer.Timer
 
 	vbk uint8 // VRAM Bank Register (0xFF4F)
 }
@@ -22,7 +26,21 @@ func NewMMU() *MMU {
 }
 
 func (m *MMU) Read(addr uint16) uint8 {
-	// 1. Intercept VRAM Range (0x8000 - 0x9FFF)
+	// This covers LCDC, STAT, SCY, SCX, LY, LYC, BGP, etc.
+	if addr >= 0xFF40 && addr <= 0xFF4B {
+
+		if addr == 0xFF44 {
+			return m.PPU.LY
+		}
+
+		return m.memory[addr]
+	}
+	// Timer covers all the Timer Read DIV TAC TIMA TMA
+	if addr >= 0xFF04 && addr <= 0xFF07 {
+		return m.Timer.Read(addr)
+	}
+
+	// Intercept VRAM Range (0x8000 - 0x9FFF)
 	if addr >= 0x8000 && addr <= 0x9FFF {
 		// Calculate offset relative to start of VRAM
 		offset := addr - 0x8000
@@ -38,7 +56,6 @@ func (m *MMU) Read(addr uint16) uint8 {
 		return m.vbk | 0xFE // bits 1-7 are always 1 on reads
 	}
 
-	// Default Memory Read
 	return m.memory[addr]
 }
 
@@ -50,6 +67,16 @@ func (m *MMU) Write(addr uint16, val uint8) {
 		return
 	}
 
+	// 2. Timer Registers (0xFF04 - 0xFF07)
+	// Route to Timer module (Handles DIV reset, TAC updates, etc)
+	if addr >= 0xFF04 && addr <= 0xFF07 {
+		m.Timer.Write(addr, val)
+		return
+	}
+
+	if addr == 0xFF04 {
+		m.Timer.Div = 0
+	}
 	// 2. VRAM (0x8000 - 0x9FFF) - Banked
 	// Routes to the specific VRAM bank and returns.
 	// We DO NOT write to m.memory[] here.
@@ -89,8 +116,12 @@ func (m *MMU) Write(addr uint16, val uint8) {
 	// Why? So that m.memory[addr] gets updated too. This makes implementing
 	// Read() easier (you can just read from memory[] for simple registers).
 
+	// Update PPU state if needed
 	if addr == 0xFF40 {
 		m.PPU.WriteLCDC(val)
+	}
+	if addr == 0xFF4F {
+		m.vbk = val & 0x01
 	}
 
 	if addr == 0xFF4F {

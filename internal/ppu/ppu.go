@@ -1,5 +1,7 @@
 package ppu
 
+import "fmt"
+
 // LCDC Flags (Bit positions)
 const (
 	LCDC_BG_ENABLE   = 0x01 // Bit 0
@@ -15,8 +17,17 @@ const (
 type PPU struct {
 
 	// The Control Register
-	Lcdc uint8
+	Lcdc       uint8
+	dotCounter int
+	LY         uint8
 }
+
+const (
+	LINE_CYCLE = 456
+	H_LEN      = 143
+	LY_AD      = 0xFF44
+	V_BLANK    = 144
+)
 
 func NewPPU() *PPU {
 	return &PPU{}
@@ -60,4 +71,18 @@ func DecodeTile(data []byte) Tile {
 	}
 
 	return tile
+}
+
+func (ppu *PPU) Tick(cycles uint8) {
+	ppu.dotCounter += int(cycles)
+	if ppu.dotCounter > LINE_CYCLE {
+		ppu.dotCounter -= LINE_CYCLE
+		ppu.LY++
+		if ppu.LY == V_BLANK {
+			fmt.Println("---VBLANK----")
+		}
+		if ppu.LY > H_LEN {
+			ppu.LY = 0
+		}
+	}
 }
