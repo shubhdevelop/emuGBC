@@ -206,6 +206,8 @@ var mainOpcodes = [256]Opcode{
 	0xBF: {Fn: (*CPU).InstrLOGIC_CP_A, Mnemonic: "CP A"},
 	0xFE: {Fn: (*CPU).InstrLOGIC_CP_d8, Mnemonic: "CP d8"},
 
+	//CPL
+	0x2F: {Fn: (*CPU).InstrLOGIC_CPL, Mnemonic: "CPL"},
 	// Move Instructions STACK:Pop
 	0xC1: {Fn: (*CPU).InstrSTACK_POP_BC, Mnemonic: "POP BC"},
 	0xC5: {Fn: (*CPU).InstrSTACK_PUSH_BC, Mnemonic: "PUSH BC"},
