@@ -30,7 +30,7 @@ func (m *MMU) Read(addr uint16) uint8 {
 	if addr >= 0xFF40 && addr <= 0xFF4B {
 
 		if addr == 0xFF44 {
-			return m.PPU.LY
+			return m.PPU.Ly
 		}
 
 		return m.memory[addr]

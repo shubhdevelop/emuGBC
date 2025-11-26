@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/shubhdevelop/emuGBC/internal/cpu"
+	"github.com/shubhdevelop/emuGBC/internal/display"
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
 	"github.com/shubhdevelop/emuGBC/internal/ppu"
 	"github.com/shubhdevelop/emuGBC/internal/timer"
@@ -17,6 +20,7 @@ func main() {
 	PPU := ppu.NewPPU()
 	Timer := timer.NewTimer()
 	MMU.PPU = PPU
+	PPU.Bus = MMU
 	MMU.Timer = Timer
 
 	cpu := cpu.NewCPU(MMU)
@@ -41,11 +45,18 @@ func main() {
 	cpu.Registers.SetDE(0x00D8)
 	cpu.Registers.SetHL(0x014D)
 
-	fmt.Println("Registers Setup done")
-	for {
-		cycles := cpu.Step()
-		PPU.Tick(uint8(cycles))
-		Timer.Tick(uint8(cycles))
-		_ = cycles
+	game := &display.Game{
+		CPU:   cpu,
+		PPU:   PPU,
+		Timer: Timer,
+		MMU:   MMU,
+	}
+
+	// 4. Start the Window!
+	ebiten.SetWindowSize(160*3, 144*3) // 3x scale so it's not tiny
+	ebiten.SetWindowTitle("EmuGBC - Tetris")
+
+	if err := ebiten.RunGame(game); err != nil {
+		log.Fatal(err)
 	}
 }
