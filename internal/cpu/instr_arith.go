@@ -1,54 +1,209 @@
 package cpu
 
-func (cpu *CPU) Add_A(value uint8) {
-	isHalfCarry := halfCarryAdd(cpu.Registers.A, value)
-	sum16 := uint16(cpu.Registers.A) + uint16(value)
-	isCarry := carryAdd(cpu.Registers.A, value)
-	cpu.Registers.A = uint8(sum16)
-	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0) // Set Z if result is 0
-	cpu.Registers.SetFlag(FlagN, false)                // Reset N (this is add, not sub)
-	cpu.Registers.SetFlag(FlagH, isHalfCarry)
-	cpu.Registers.SetFlag(FlagC, isCarry)
+func (cpu *CPU) Add(value uint8) int {
+	a := cpu.Registers.A
+	result := a + value
+
+	// Flags
+	cpu.Registers.SetFlag(FlagZ, result == 0)
+	cpu.Registers.SetFlag(FlagN, false)
+	cpu.Registers.SetFlag(FlagH, halfCarryAdd(a, value))
+	cpu.Registers.SetFlag(FlagC, carryAdd(a, value))
+
+	cpu.Registers.A = result
+	return 4
 }
 
-func (cpu *CPU) Sub_A(value uint8) {
-	isHalfCarry := halfCarrySub(cpu.Registers.A, value)
-	isCarry := carrySub(cpu.Registers.A, value)
-	cpu.Registers.A -= value
-	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0)
+func (cpu *CPU) AddC(value uint8) int {
+	a := cpu.Registers.A
+	carryIn := uint8(0)
+	if cpu.Registers.GetFlag(FlagC) {
+		carryIn = 1
+	}
+
+	result := a + value + carryIn
+
+	// Flags
+	cpu.Registers.SetFlag(FlagZ, result == 0)
+	cpu.Registers.SetFlag(FlagN, false)
+	cpu.Registers.SetFlag(FlagH, ((a&0x0F)+(value&0x0F)+carryIn) > 0x0F)
+	cpu.Registers.SetFlag(
+		FlagC,
+		uint16(a)+uint16(value)+uint16(carryIn) > 0xFF,
+	)
+
+	cpu.Registers.A = result
+	return 4
+}
+
+func (cpu *CPU) Sub(value uint8) int {
+	a := cpu.Registers.A
+	result := a - value
+
+	cpu.Registers.SetFlag(FlagZ, result == 0)
 	cpu.Registers.SetFlag(FlagN, true)
-	cpu.Registers.SetFlag(FlagH, isHalfCarry)
-	cpu.Registers.SetFlag(FlagC, isCarry)
+	cpu.Registers.SetFlag(FlagH, halfCarrySub(a, value)) // half borrow
+	cpu.Registers.SetFlag(FlagC, a < value)              // borrow
+
+	cpu.Registers.A = result
+	return 4
 }
 
-func (cpu *CPU) And_A(value uint8) {
-	cpu.Registers.A &= value
-	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0)
-	cpu.Registers.SetFlag(FlagN, false)
+func (cpu *CPU) SubC(value uint8) int {
+	a := cpu.Registers.A
+	carryIn := uint8(0)
+	if cpu.Registers.GetFlag(FlagC) {
+		carryIn = 1
+	}
 
-	/*
-	 * Game Boy CPU (Sharp LR35902),
-	 * the AND instruction's internal circuitry biases the Half-Carry line high.
-	 * It is a famous quirk of this specific CPU.
-	 */
-	cpu.Registers.SetFlag(FlagH, true)
-	cpu.Registers.SetFlag(FlagC, false)
+	result := a - value - carryIn
+
+	// Flags
+	cpu.Registers.SetFlag(FlagZ, result == 0)
+	cpu.Registers.SetFlag(FlagN, true)
+
+	// Half-borrow: checks bit 3 → bit 4 borrow
+	cpu.Registers.SetFlag(
+		FlagH,
+		(a&0x0F) < ((value&0x0F)+carryIn),
+	)
+
+	// Full borrow
+	cpu.Registers.SetFlag(
+		FlagC,
+		uint16(a) < uint16(value)+uint16(carryIn),
+	)
+
+	cpu.Registers.A = result
+	return 4
 }
 
-func (cpu *CPU) Or_A(value uint8) {
-	cpu.Registers.A |= value
-	cpu.Registers.SetFlag(FlagZ, cpu.Registers.A == 0)
-	cpu.Registers.SetFlag(FlagN, false)
-	cpu.Registers.SetFlag(FlagH, false)
-	cpu.Registers.SetFlag(FlagC, false)
+// ADD
+func (cpu *CPU) ADD_B() int {
+	return cpu.Add(cpu.Registers.B)
+}
+func (cpu *CPU) ADD_C() int {
+	return cpu.Add(cpu.Registers.C)
+}
+func (cpu *CPU) ADD_D() int {
+	return cpu.Add(cpu.Registers.D)
+}
+func (cpu *CPU) ADD_E() int {
+	return cpu.Add(cpu.Registers.E)
+}
+func (cpu *CPU) ADD_H() int {
+	return cpu.Add(cpu.Registers.H)
+}
+func (cpu *CPU) ADD_L() int {
+	return cpu.Add(cpu.Registers.L)
+}
+func (cpu *CPU) ADD_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.Add(val) + 4
+}
+func (cpu *CPU) ADD_A() int {
+	return cpu.Add(cpu.Registers.A)
 }
 
-// func (cpu *CPU) InstrARITH_Dec_B() int {
-// 	cpu.Registers.A -= 1
-// 	return 4
-// }
+func (cpu *CPU) ADD_d8() int {
+	val := cpu.FetchByte()
+	return cpu.Add(val) + 4
+}
 
-// func (cpu *CPU) InstrARITH_Dec_C() int {
-// 	cpu.Registers.C -= 1
-// 	return 4
-// }
+// ADC
+func (cpu *CPU) ADC_B() int {
+	return cpu.AddC(cpu.Registers.B)
+}
+func (cpu *CPU) ADC_C() int {
+	return cpu.AddC(cpu.Registers.C)
+}
+func (cpu *CPU) ADC_D() int {
+	return cpu.AddC(cpu.Registers.D)
+}
+func (cpu *CPU) ADC_E() int {
+	return cpu.AddC(cpu.Registers.E)
+}
+func (cpu *CPU) ADC_H() int {
+	return cpu.AddC(cpu.Registers.H)
+}
+func (cpu *CPU) ADC_L() int {
+	return cpu.AddC(cpu.Registers.L)
+}
+func (cpu *CPU) ADC_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.AddC(val) + 4
+}
+func (cpu *CPU) ADC_A() int {
+	return cpu.AddC(cpu.Registers.A)
+}
+func (cpu *CPU) ADC_d8() int {
+	val := cpu.FetchByte()
+	return cpu.AddC(val) + 4
+}
+
+// SUB
+func (cpu *CPU) SUB_B() int {
+	return cpu.Sub(cpu.Registers.B)
+}
+func (cpu *CPU) SUB_C() int {
+	return cpu.Sub(cpu.Registers.C)
+}
+func (cpu *CPU) SUB_D() int {
+	return cpu.Sub(cpu.Registers.D)
+}
+func (cpu *CPU) SUB_E() int {
+	return cpu.Sub(cpu.Registers.E)
+}
+func (cpu *CPU) SUB_H() int {
+	return cpu.Sub(cpu.Registers.H)
+}
+func (cpu *CPU) SUB_L() int {
+	return cpu.Sub(cpu.Registers.L)
+}
+func (cpu *CPU) SUB_HL_ad() int {
+	SUBr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(SUBr)
+	return cpu.Sub(val) + 4
+}
+func (cpu *CPU) SUB_A() int {
+	return cpu.Sub(cpu.Registers.A)
+}
+
+func (cpu *CPU) SUB_d8() int {
+	val := cpu.FetchByte()
+	return cpu.Sub(val) + 4
+}
+
+// SBC
+func (cpu *CPU) SBC_B() int {
+	return cpu.SubC(cpu.Registers.B)
+}
+func (cpu *CPU) SBC_C() int {
+	return cpu.SubC(cpu.Registers.C)
+}
+func (cpu *CPU) SBC_D() int {
+	return cpu.SubC(cpu.Registers.D)
+}
+func (cpu *CPU) SBC_E() int {
+	return cpu.SubC(cpu.Registers.E)
+}
+func (cpu *CPU) SBC_H() int {
+	return cpu.SubC(cpu.Registers.H)
+}
+func (cpu *CPU) SBC_L() int {
+	return cpu.SubC(cpu.Registers.L)
+}
+func (cpu *CPU) SBC_HL_ad() int {
+	SUBr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(SUBr)
+	return cpu.SubC(val) + 4
+}
+func (cpu *CPU) SBC_A() int {
+	return cpu.SubC(cpu.Registers.A)
+}
+func (cpu *CPU) SBC_d8() int {
+	val := cpu.FetchByte()
+	return cpu.SubC(val) + 4
+}
