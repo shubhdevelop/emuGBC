@@ -359,42 +359,254 @@ func (cpu *CPU) InstrLD_L_d8() int {
 	return 8
 }
 
-/*
-OPCODE: 0x78
-DESCRIPTION: laad A with B
-CYCLE: 4
-*/
-func (cpu *CPU) InstrLD_A_B() int {
-	cpu.Registers.A = cpu.Registers.B
+func (cpu *CPU) LoadB(val uint8) int {
+	cpu.Registers.B = val
+	return 4
+}
+func (cpu *CPU) LoadC(val uint8) int {
+	cpu.Registers.C = val
+	return 4
+}
+func (cpu *CPU) LoadD(val uint8) int {
+	cpu.Registers.D = val
+	return 4
+}
+func (cpu *CPU) LoadE(val uint8) int {
+	cpu.Registers.E = val
+	return 4
+}
+func (cpu *CPU) LoadH(val uint8) int {
+	cpu.Registers.H = val
+	return 4
+}
+func (cpu *CPU) LoadL(val uint8) int {
+	cpu.Registers.L = val
+	return 4
+}
+func (cpu *CPU) LoadHL(val uint8) int {
+	// 1. Get Address
+	addr := cpu.Registers.GetHL()
+
+	// 2. Write to Memory
+	cpu.Bus.Write(addr, val)
+
+	// 3. Return 8 Cycles
 	return 8
 }
 
-/*
-OPCODE: 0x47
-DESCRIPTION: laad B with A
-CYCLE: 4
-*/
+func (cpu *CPU) LoadA(val uint8) int {
+	cpu.Registers.A = val
+	return 4
+}
+
+func (cpu *CPU) InstrLD_B_B() int {
+	return cpu.LoadB(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_B_C() int {
+	return cpu.LoadB(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_B_D() int {
+	return cpu.LoadB(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_B_E() int {
+	return cpu.LoadB(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_B_H() int {
+	return cpu.LoadB(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_B_L() int {
+	return cpu.LoadB(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_B_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadB(val) + 4
+}
 func (cpu *CPU) InstrLD_B_A() int {
-	cpu.Registers.B = cpu.Registers.A
-	return 8
+	return cpu.LoadB(cpu.Registers.A)
 }
 
-/*
-OPCODE: 0x4F
-DESCRIPTION: laad C with A
-CYCLE: 4
-*/
+func (cpu *CPU) InstrLD_C_B() int {
+	return cpu.LoadC(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_C_C() int {
+	return cpu.LoadC(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_C_D() int {
+	return cpu.LoadC(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_C_E() int {
+	return cpu.LoadC(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_C_H() int {
+	return cpu.LoadC(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_C_L() int {
+	return cpu.LoadC(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_C_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadC(val) + 4
+}
 func (cpu *CPU) InstrLD_C_A() int {
-	cpu.Registers.C = cpu.Registers.A
-	return 8
+	return cpu.LoadC(cpu.Registers.A)
 }
 
-/*
-OPCODE: 0x79
-DESCRIPTION: laad A with C
-CYCLE: 4
-*/
+func (cpu *CPU) InstrLD_D_B() int {
+	return cpu.LoadD(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_D_C() int {
+	return cpu.LoadD(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_D_D() int {
+	return cpu.LoadD(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_D_E() int {
+	return cpu.LoadD(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_D_H() int {
+	return cpu.LoadD(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_D_L() int {
+	return cpu.LoadD(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_D_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadD(val) + 4
+}
+func (cpu *CPU) InstrLD_D_A() int {
+	return cpu.LoadD(cpu.Registers.A)
+}
+
+func (cpu *CPU) InstrLD_E_B() int {
+	return cpu.LoadE(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_E_C() int {
+	return cpu.LoadE(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_E_D() int {
+	return cpu.LoadE(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_E_E() int {
+	return cpu.LoadE(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_E_H() int {
+	return cpu.LoadE(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_E_L() int {
+	return cpu.LoadE(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_E_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadE(val) + 4
+}
+func (cpu *CPU) InstrLD_E_A() int {
+	return cpu.LoadE(cpu.Registers.A)
+}
+
+func (cpu *CPU) InstrLD_H_B() int {
+	return cpu.LoadH(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_H_C() int {
+	return cpu.LoadH(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_H_D() int {
+	return cpu.LoadH(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_H_E() int {
+	return cpu.LoadH(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_H_H() int {
+	return cpu.LoadH(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_H_L() int {
+	return cpu.LoadH(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_H_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadH(val) + 4
+}
+func (cpu *CPU) InstrLD_H_A() int {
+	return cpu.LoadH(cpu.Registers.A)
+}
+
+func (cpu *CPU) InstrLD_L_B() int {
+	return cpu.LoadL(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_L_C() int {
+	return cpu.LoadL(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_L_D() int {
+	return cpu.LoadL(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_L_E() int {
+	return cpu.LoadL(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_L_H() int {
+	return cpu.LoadL(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_L_L() int {
+	return cpu.LoadL(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_L_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadL(val) + 4
+}
+func (cpu *CPU) InstrLD_L_A() int {
+	return cpu.LoadL(cpu.Registers.A)
+}
+
+func (cpu *CPU) InstrLD_HL_ad_B() int {
+	return cpu.LoadHL(cpu.Registers.B)
+}
+func (cpu *CPU) InstrLD_HL_ad_C() int {
+	return cpu.LoadHL(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_HL_ad_D() int {
+	return cpu.LoadHL(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_HL_ad_E() int {
+	return cpu.LoadHL(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_HL_ad_H() int {
+	return cpu.LoadHL(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_HL_ad_L() int {
+	return cpu.LoadHL(cpu.Registers.L)
+}
+
+func (cpu *CPU) InstrLD_HL_ad_A() int {
+	return cpu.LoadHL(cpu.Registers.A)
+}
+
+func (cpu *CPU) InstrLD_A_B() int {
+	return cpu.LoadA(cpu.Registers.B)
+}
 func (cpu *CPU) InstrLD_A_C() int {
-	cpu.Registers.A = cpu.Registers.C
-	return 8
+	return cpu.LoadA(cpu.Registers.C)
+}
+func (cpu *CPU) InstrLD_A_D() int {
+	return cpu.LoadA(cpu.Registers.D)
+}
+func (cpu *CPU) InstrLD_A_E() int {
+	return cpu.LoadA(cpu.Registers.E)
+}
+func (cpu *CPU) InstrLD_A_H() int {
+	return cpu.LoadA(cpu.Registers.H)
+}
+func (cpu *CPU) InstrLD_A_L() int {
+	return cpu.LoadA(cpu.Registers.L)
+}
+func (cpu *CPU) InstrLD_A_HL_ad() int {
+	addr := cpu.Registers.GetHL()
+	val := cpu.Bus.Read(addr)
+	return cpu.LoadA(val) + 4
+}
+func (cpu *CPU) InstrLD_A_A() int {
+	return cpu.LoadA(cpu.Registers.A)
 }
