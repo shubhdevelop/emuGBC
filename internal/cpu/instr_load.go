@@ -307,3 +307,33 @@ func (cpu *CPU) InstrLD_A_B() int {
 	cpu.Registers.A = cpu.Registers.B
 	return 8
 }
+
+/*
+OPCODE: 0x47
+DESCRIPTION: laad B with A
+CYCLE: 4
+*/
+func (cpu *CPU) InstrLD_B_A() int {
+	cpu.Registers.B = cpu.Registers.A
+	return 8
+}
+
+/*
+OPCODE: 0x4F
+DESCRIPTION: laad C with A
+CYCLE: 4
+*/
+func (cpu *CPU) InstrLD_C_A() int {
+	cpu.Registers.C = cpu.Registers.A
+	return 8
+}
+
+/*
+OPCODE: 0x79
+DESCRIPTION: laad A with C
+CYCLE: 4
+*/
+func (cpu *CPU) InstrLD_A_C() int {
+	cpu.Registers.A = cpu.Registers.C
+	return 8
+}
