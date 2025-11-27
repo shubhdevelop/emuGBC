@@ -251,6 +251,67 @@ func (cpu *CPU) InstrLD_a16_ad_A() int {
 }
 
 /*
+OPCODE: 0xFA
+DESCRIPTION: laad A with value at addres a16
+CYCLE: 16
+*/
+func (cpu *CPU) InstrLD_A_a16_ad() int {
+	addr := cpu.FetchWord()
+	val := cpu.Bus.Read(addr)
+	cpu.Registers.A = val
+	return 16
+}
+
+/*
+OPCODE: 0xFA
+DESCRIPTION: laad HL into SP
+CYCLE: 16
+*/
+func (cpu *CPU) InstrLD_SP_HL() int {
+	cpu.Registers.SP = cpu.Registers.GetHL()
+	return 8
+}
+
+/*
+OPCODE: 0xF8
+DESCRIPTION: laad HL with SP+r8
+CYCLE: 12
+*/
+func (cpu *CPU) InstrLD_HL_SP_r8() int {
+	// 1. Fetch the raw unsigned byte (for flags)
+	rawOffset := cpu.FetchByte()
+
+	// 2. Interpret as signed (for math)
+	offset := int8(rawOffset)
+
+	// 3. Do the Math (16-bit)
+	sp := cpu.Registers.SP
+	result := uint16(int32(sp) + int32(offset))
+
+	// 4. Update Flags
+	cpu.Registers.SetFlag(FlagZ, false)
+	cpu.Registers.SetFlag(FlagN, false)
+
+	// Half Carry: Check overflow from bit 3
+	// We use the raw unsigned value here to check the bit carry logic
+	cpu.Registers.SetFlag(
+		FlagH,
+		(sp&0x0F)+uint16(rawOffset&0x0F) > 0x0F,
+	)
+
+	// Full Carry: Check overflow from bit 7 (Byte overflow)
+	cpu.Registers.SetFlag(
+		FlagC,
+		(sp&0xFF)+uint16(rawOffset) > 0xFF,
+	)
+
+	// 5. Store Result
+	cpu.Registers.SetHL(result)
+
+	return 12
+}
+
+/*
 OPCODE: 0x2A
 DESCRIPTION: laad address [HL] into A, increment HL
 CYCLE: 8

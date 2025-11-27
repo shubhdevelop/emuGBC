@@ -111,6 +111,39 @@ func (cpu *CPU) ADD_d8() int {
 	return cpu.Add(val) + 4
 }
 
+/*
+OPCODE: 0xE8
+DESCRIPTION: ADD SP, r8 (Add signed immediate to SP)
+CYCLES: 16
+*/
+func (cpu *CPU) ADD_SP_r8() int {
+
+	raw := cpu.FetchByte()
+	offset := int8(raw)
+
+	sp := cpu.Registers.SP
+
+	// We cast to int32 to handle the negative addition cleanly
+	result := uint16(int32(sp) + int32(offset))
+
+	// 3. Update Flags (Z=0, N=0)
+	cpu.Registers.SetFlag(FlagZ, false)
+	cpu.Registers.SetFlag(FlagN, false)
+
+	cpu.Registers.SetFlag(
+		FlagH,
+		(sp&0x0F)+uint16(raw&0x0F) > 0x0F,
+	)
+	cpu.Registers.SetFlag(
+		FlagC,
+		(sp&0xFF)+uint16(raw) > 0xFF,
+	)
+
+	cpu.Registers.SP = result
+
+	return 16
+}
+
 // ADC
 func (cpu *CPU) ADC_B() int {
 	return cpu.AddC(cpu.Registers.B)

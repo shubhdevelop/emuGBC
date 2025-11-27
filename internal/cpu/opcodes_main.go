@@ -88,9 +88,9 @@ var mainOpcodes = [256]Opcode{
 	0xEA: {Fn: (*CPU).InstrLD_a16_ad_A, Mnemonic: "LD (a16), A"},
 	0xF0: {Fn: (*CPU).InstrLDH_A_a8, Mnemonic: "LD (a8) A"},
 	0xF2: {Fn: (*CPU).InstrLD_A_C_Ad, Mnemonic: "LD A (C)"},
-	0xF8: {},
-	0xF9: {},
-	0xFA: {},
+	0xF8: {Fn: (*CPU).InstrLD_HL_SP_r8, Mnemonic: "LD HL SP+r8"},
+	0xF9: {Fn: (*CPU).InstrLD_SP_HL, Mnemonic: "LD SP HL"},
+	0xFA: {Fn: (*CPU).InstrLD_A_a16_ad, Mnemonic: "LD A (a16)"},
 
 	//Inc / Dec
 	0x03: {Fn: (*CPU).INC_BC, Mnemonic: "INC BC"},
@@ -128,7 +128,7 @@ var mainOpcodes = [256]Opcode{
 	0x86: {Fn: (*CPU).ADD_HL_ad, Mnemonic: "ADD A (HL)"},
 	0x87: {Fn: (*CPU).ADD_A, Mnemonic: "ADD A A"},
 	0xC6: {Fn: (*CPU).ADD_d8, Mnemonic: "AND d8"},
-
+	0xE8: {Fn: (*CPU).ADD_SP_r8, Mnemonic: "AND d8"},
 	// ADC
 	0x88: {Fn: (*CPU).ADC_B, Mnemonic: "ADC A B"},
 	0x89: {Fn: (*CPU).ADC_C, Mnemonic: "ADC A C"},
