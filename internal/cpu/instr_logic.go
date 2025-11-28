@@ -33,7 +33,8 @@ func (cpu *CPU) CP(value byte) int {
 	cpu.Registers.SetFlag(FlagZ, (result == 0))
 	cpu.Registers.SetFlag(FlagN, true)
 	cpu.Registers.SetFlag(FlagH, halfCarrySub(a, value))
-	cpu.Registers.SetFlag(FlagH, carrySub(a, value))
+	cpu.Registers.SetFlag(FlagC, carrySub(a, value))
+	// fmt.Printf("DEBUG: CP 0x%02X with A=0x%02X\n", value, a)
 	return 4
 }
 

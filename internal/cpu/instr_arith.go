@@ -14,6 +14,24 @@ func (cpu *CPU) Add(value uint8) int {
 	return 4
 }
 
+func (cpu *CPU) add_HL_rr(val uint16) int {
+	hl := cpu.Registers.GetHL()
+
+	sum := int32(hl) + int32(val)
+
+	cpu.Registers.SetFlag(FlagN, false)
+
+	isHalfCarry := (hl&0x0FFF)+(val&0x0FFF) > 0x0FFF
+	cpu.Registers.SetFlag(FlagH, isHalfCarry)
+
+	isCarry := sum > 0xFFFF
+	cpu.Registers.SetFlag(FlagC, isCarry)
+
+	cpu.Registers.SetHL(uint16(sum))
+
+	return 8
+}
+
 func (cpu *CPU) AddC(value uint8) int {
 	a := cpu.Registers.A
 	carryIn := uint8(0)
@@ -75,6 +93,7 @@ func (cpu *CPU) SubC(value uint8) int {
 	)
 
 	cpu.Registers.A = result
+	// fmt.Printf("DEBUG: SUB 0x%02X from A=0x%02X\n", value, a)
 	return 4
 }
 
@@ -239,4 +258,76 @@ func (cpu *CPU) SBC_A() int {
 func (cpu *CPU) SBC_d8() int {
 	val := cpu.FetchByte()
 	return cpu.SubC(val) + 4
+}
+
+func (cpu *CPU) ADD_HL_BC() int {
+	return cpu.add_HL_rr(cpu.Registers.GetBC())
+}
+
+func (cpu *CPU) ADD_HL_DE() int {
+	return cpu.add_HL_rr(cpu.Registers.GetDE())
+}
+
+func (cpu *CPU) ADD_HL_HL() int {
+	return cpu.add_HL_rr(cpu.Registers.GetHL())
+}
+
+func (cpu *CPU) ADD_HL_SP() int {
+	return cpu.add_HL_rr(cpu.Registers.SP)
+}
+
+/*
+OPCODE: 0x27
+DESCRIPTION: DAA (Decimal Adjust Accumulator)
+CYCLES: 4
+*/
+func (cpu *CPU) DAA() int {
+	a := cpu.Registers.A
+	adjust := uint8(0)
+	carry := false
+
+	if cpu.Registers.GetFlag(FlagH) || (!cpu.Registers.GetFlag(FlagN) && (a&0x0F) > 9) {
+		adjust |= 0x06
+	}
+
+	if cpu.Registers.GetFlag(FlagC) || (!cpu.Registers.GetFlag(FlagN) && a > 0x99) {
+		adjust |= 0x60
+		carry = true
+	}
+
+	if cpu.Registers.GetFlag(FlagN) {
+		a -= adjust
+	} else {
+		a += adjust
+	}
+
+	cpu.Registers.A = a
+	cpu.Registers.SetFlag(FlagZ, a == 0)
+	cpu.Registers.SetFlag(FlagH, false)
+	cpu.Registers.SetFlag(FlagC, carry)
+	return 4
+}
+
+/*
+OPCODE: 0x37
+DESCRIPTION: SCF (Set Carry Flag)
+CYCLES: 4
+*/
+func (cpu *CPU) SCF() int {
+	cpu.Registers.SetFlag(FlagN, false)
+	cpu.Registers.SetFlag(FlagH, false)
+	cpu.Registers.SetFlag(FlagC, true)
+	return 4
+}
+
+/*
+OPCODE: 0x3F
+DESCRIPTION: CCF (Complement Carry Flag)
+CYCLES: 4
+*/
+func (cpu *CPU) CCF() int {
+	cpu.Registers.SetFlag(FlagN, false)
+	cpu.Registers.SetFlag(FlagH, false)
+	cpu.Registers.SetFlag(FlagC, !cpu.Registers.GetFlag(FlagC))
+	return 4
 }

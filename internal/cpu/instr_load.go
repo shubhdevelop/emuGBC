@@ -1,5 +1,6 @@
 package cpu
 
+
 /*
 OPCODE: 0x01
 DESCRIPTION: Load immediate 16-bit value into BC
@@ -263,7 +264,7 @@ func (cpu *CPU) InstrLD_A_a16_ad() int {
 }
 
 /*
-OPCODE: 0xFA
+OPCODE: 0xF9
 DESCRIPTION: laad HL into SP
 CYCLE: 16
 */

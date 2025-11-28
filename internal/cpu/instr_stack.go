@@ -26,14 +26,14 @@ func (cpu *CPU) InstrSTACK_PUSH_BC() int {
 	return 16
 }
 func (cpu *CPU) InstrSTACK_PUSH_DE() int {
-	cpu.Push(cpu.Registers.GetBC())
+	cpu.Push(cpu.Registers.GetDE())
 	return 16
 }
 func (cpu *CPU) InstrSTACK_PUSH_HL() int {
-	cpu.Push(cpu.Registers.GetBC())
+	cpu.Push(cpu.Registers.GetHL())
 	return 16
 }
 func (cpu *CPU) InstrSTACK_PUSH_AF() int {
-	cpu.Push(cpu.Registers.GetBC())
+	cpu.Push(cpu.Registers.GetAF())
 	return 16
 }
