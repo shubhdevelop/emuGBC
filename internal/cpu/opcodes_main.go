@@ -133,6 +133,10 @@ var mainOpcodes = [256]Opcode{
 	0x87: {Fn: (*CPU).ADD_A, Mnemonic: "ADD A A"},
 	0xC6: {Fn: (*CPU).ADD_d8, Mnemonic: "AND d8"},
 	0xE8: {Fn: (*CPU).ADD_SP_r8, Mnemonic: "AND d8"},
+	0x09: {Fn: (*CPU).ADD_HL_BC, Mnemonic: "AND HL BC"},
+	0x19: {Fn: (*CPU).ADD_HL_DE, Mnemonic: "AND HL DE"},
+	0x29: {Fn: (*CPU).ADD_HL_HL, Mnemonic: "AND HL HL"},
+	0x39: {Fn: (*CPU).ADD_HL_SP, Mnemonic: "AND HL SP"},
 	// ADC
 	0x88: {Fn: (*CPU).ADC_B, Mnemonic: "ADC A B"},
 	0x89: {Fn: (*CPU).ADC_C, Mnemonic: "ADC A C"},
@@ -156,7 +160,7 @@ var mainOpcodes = [256]Opcode{
 	0xD6: {Fn: (*CPU).SUB_d8, Mnemonic: "SUB d8"},
 
 	// SBC
-	0x9:  {Fn: (*CPU).SBC_B, Mnemonic: "SBC A B"},
+	0x98:  {Fn: (*CPU).SBC_B, Mnemonic: "SBC A B"},
 	0x99: {Fn: (*CPU).SBC_C, Mnemonic: "SBC A C"},
 	0x9A: {Fn: (*CPU).SBC_D, Mnemonic: "SBC A  D"},
 	0x9B: {Fn: (*CPU).SBC_E, Mnemonic: "SBC A E"},
