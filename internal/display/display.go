@@ -1,6 +1,8 @@
 package display
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/shubhdevelop/emuGBC/internal/cpu"
 	"github.com/shubhdevelop/emuGBC/internal/mmu"
@@ -23,10 +25,24 @@ func (g *Game) Update() error {
 	cyclesPerFrame := 70224
 	cyclesRun := 0
 
+	right := ebiten.IsKeyPressed(ebiten.KeyArrowRight)
+	left := ebiten.IsKeyPressed(ebiten.KeyArrowLeft)
+	up := ebiten.IsKeyPressed(ebiten.KeyArrowUp)
+	down := ebiten.IsKeyPressed(ebiten.KeyArrowDown)
+
+	a := ebiten.IsKeyPressed(ebiten.KeyZ)         // Z = A
+	b := ebiten.IsKeyPressed(ebiten.KeyX)         // X = B
+	sel := ebiten.IsKeyPressed(ebiten.KeySpace)   // Space = Select
+	start := ebiten.IsKeyPressed(ebiten.KeyEnter) // Enter = Start
+	if right || left || up || down || a || b || sel || start {
+		fmt.Printf("right: %t, left: %t, up: %t, down: %t, a: %t , b: %t , sel: %t, start: %t \n", right, left, up, down, a, b, sel, start)
+	}
+
+	// Push to Emulator
+	g.MMU.Joypad.UpdateState(right, left, up, down, a, b, sel, start)
 	for cyclesRun < cyclesPerFrame {
 		// 1. Step CPU
 		cycles := g.CPU.Step()
-
 		// 2. Step PPU & Timer
 		g.PPU.Tick(int(cycles))
 		g.Timer.Tick(cycles)
