@@ -43,17 +43,17 @@ func (j *Joypad) Read() uint8 {
 	// Bits 6 and 7 are always 1 (Unused)
 	// Bit 5 and 4 come from our selection state
 	res := uint8(0xCF)
-
+	
 	if !j.SelectAction {
 		res &= ^uint8(0x20)  // Clear Bit 5 (Set to 0) to show it's active
 		res &= j.ActionState // Combine with Action Buttons (A, B, etc)
 	}
-
+	
 	if !j.SelectDirection {
 		res &= ^uint8(0x10)     // Clear Bit 4
 		res &= j.DirectionState // Combine with D-Pad
 	}
-
+	
 	return res
 }
 

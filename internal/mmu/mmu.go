@@ -1,6 +1,7 @@
 package mmu
 
 import (
+	"github.com/shubhdevelop/emuGBC/internal/joypad"
 	"github.com/shubhdevelop/emuGBC/internal/ppu"
 	"github.com/shubhdevelop/emuGBC/internal/timer"
 )
@@ -8,6 +9,7 @@ import (
 type MMU struct {
 	// Represents the entire 64KB address space
 	memory [0x10000]uint8
+	Joypad *joypad.Joypad
 
 	// GBC VRAM: 2 Banks, each 8KB (0x2000 bytes)
 	// Bank 0: Standard Data
@@ -56,10 +58,36 @@ func (m *MMU) Read(addr uint16) uint8 {
 		return m.vbk | 0xFE // bits 1-7 are always 1 on reads
 	}
 
+	// Joypad register (0xFF00)
+	// Return cached value from memory to avoid recalculating on every read
+	// The value is updated by Joypad.Write() and Joypad.UpdateState()
+	if addr == 0xFF00 {
+		return m.memory[addr]
+	}
+
 	return m.memory[addr]
 }
 
 func (m *MMU) Write(addr uint16, val uint8) {
+
+	if addr == 0xFF46 {
+		m.startDMA(val)
+		// Update memory to track DMA state
+		m.memory[addr] = val
+		return
+	}
+
+	if addr == 0xFF00 {
+		if m.Joypad != nil {
+			m.Joypad.Write(val)
+			// Update memory with the actual joypad state (including button states)
+			// not just the selection bits
+			m.memory[addr] = m.Joypad.Read()
+		} else {
+			m.memory[addr] = val
+		}
+		return
+	}
 
 	// 1. ROM PROTECTION (0x0000 - 0x7FFF)
 	// Read-Only. Ignore writes.
@@ -150,4 +178,28 @@ func (m *MMU) WriteWord(addr uint16, val uint16) {
 
 func (m *MMU) LoadROM(data []byte) {
 	copy(m.memory[:], data)
+}
+
+// startDMA copies 160 bytes from (value * 0x100) to OAM (0xFE00)
+func (m *MMU) startDMA(startAddrHigh uint8) {
+	// 1. Calculate Source Address
+	// e.g., if val is 0xC1, source is 0xC100
+	source := uint16(startAddrHigh) << 8
+
+	// fmt.Printf("DMA Transfer: Copied 160 bytes from %04X to OAM\n", source)
+	// 2. Perform the Copy
+	for i := 0; i < 160; i++ { // 0x00 to 0x9F
+		// Read byte from Source (RAM/ROM)
+		// We use m.Read to ensure we follow correct memory mapping rules
+		byteVal := m.Read(source + uint16(i))
+
+		// Write byte to OAM (0xFE00 + i)
+		// Note: You might need to access m.memory directly if your Write()
+		// function blocks OAM writes during certain PPU modes.
+		// For Week 1, direct array access is safest here:
+		m.memory[0xFE00+uint16(i)] = byteVal
+	}
+
+	// (Note: On real hardware, this takes 160 microseconds.
+	// Instant copy is fine for Tetris).
 }
