@@ -201,7 +201,7 @@ CYCLE: 8
 */
 func (cpu *CPU) InstrLD_A_C_Ad() int {
 	addr := 0xFF00 + uint16(cpu.Registers.C)
-	cpu.Registers.A = cpu.Bus.Read(uint16(addr))
+	cpu.Registers.A = cpu.Bus.Read(addr)
 	return 8
 }
 
@@ -266,7 +266,7 @@ func (cpu *CPU) InstrLD_A_a16_ad() int {
 /*
 OPCODE: 0xF9
 DESCRIPTION: laad HL into SP
-CYCLE: 16
+CYCLE: 8
 */
 func (cpu *CPU) InstrLD_SP_HL() int {
 	cpu.Registers.SP = cpu.Registers.GetHL()

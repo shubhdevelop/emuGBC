@@ -112,3 +112,20 @@ func (cpu *CPU) Pop() uint16 {
 
 	return (uint16(high) << 8) | uint16(low)
 }
+
+func (cpu *CPU) HandleInterrupts() {
+	// Read Registers
+	IE := cpu.Bus.Read(0xFFFF)
+	IF := cpu.Bus.Read(0xFF0F)
+
+	// DEBUG: Only print if there is ACTUAL activity to avoid spam
+	if (IF & 1) != 0 {
+		fmt.Printf("DEBUG: V-Blank Pending! IF=%02X IE=%02X IME=%v\n", IF, IE, cpu.IME)
+	}
+
+	if !cpu.IME {
+		return
+	}
+
+	// ... rest of logic ...
+}
