@@ -331,3 +331,13 @@ func (cpu *CPU) CCF() int {
 	cpu.Registers.SetFlag(FlagC, !cpu.Registers.GetFlag(FlagC))
 	return 4
 }
+
+func (cpu *CPU) CPL() int {
+	cpu.Registers.A = ^cpu.Registers.A
+
+	// Flags: N=1, H=1. Z and C are preserved (don't touch them).
+	cpu.Registers.SetFlag(FlagN, true)
+	cpu.Registers.SetFlag(FlagH, true)
+
+	return 4
+}

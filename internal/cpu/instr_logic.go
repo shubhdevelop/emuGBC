@@ -164,11 +164,3 @@ func (cpu *CPU) InstrLOGIC_XOR_d8() int {
 	val := cpu.FetchByte()
 	return cpu.XOR(val) + 4
 }
-func (cpu *CPU) InstrLOGIC_CPL() int {
-	cpu.Registers.A = ^cpu.Registers.A
-
-	// Flags: N=1, H=1. Z and C are preserved.
-	cpu.Registers.SetFlag(FlagN, true)
-	cpu.Registers.SetFlag(FlagH, true)
-	return 4
-}

@@ -160,7 +160,7 @@ var mainOpcodes = [256]Opcode{
 	0xD6: {Fn: (*CPU).SUB_d8, Mnemonic: "SUB d8"},
 
 	// SBC
-	0x98:  {Fn: (*CPU).SBC_B, Mnemonic: "SBC A B"},
+	0x98: {Fn: (*CPU).SBC_B, Mnemonic: "SBC A B"},
 	0x99: {Fn: (*CPU).SBC_C, Mnemonic: "SBC A C"},
 	0x9A: {Fn: (*CPU).SBC_D, Mnemonic: "SBC A  D"},
 	0x9B: {Fn: (*CPU).SBC_E, Mnemonic: "SBC A E"},
@@ -214,8 +214,14 @@ var mainOpcodes = [256]Opcode{
 	0xBF: {Fn: (*CPU).InstrLOGIC_CP_A, Mnemonic: "CP A"},
 	0xFE: {Fn: (*CPU).InstrLOGIC_CP_d8, Mnemonic: "CP d8"},
 
+	//DAA
+	0x27: {Fn: (*CPU).DAA, Mnemonic: "DAA"},
 	//CPL
-	0x2F: {Fn: (*CPU).InstrLOGIC_CPL, Mnemonic: "CPL"},
+	0x2F: {Fn: (*CPU).CPL, Mnemonic: "CPL"},
+	// SCF
+	0x37: {Fn: (*CPU).SCF, Mnemonic: "SCF"},
+	// CCF
+	0x3F: {Fn: (*CPU).CCF, Mnemonic: "CCF"},
 	// Move Instructions STACK:Pop
 	0xC1: {Fn: (*CPU).InstrSTACK_POP_BC, Mnemonic: "POP BC"},
 	0xC5: {Fn: (*CPU).InstrSTACK_PUSH_BC, Mnemonic: "PUSH BC"},
@@ -269,6 +275,12 @@ var mainOpcodes = [256]Opcode{
 	0x76: {Fn: (*CPU).InstrCONT_HALT, Mnemonic: "HALT"},
 	0xF3: {Fn: (*CPU).InstrCONT_DI, Mnemonic: "DI"},
 	0xFB: {Fn: (*CPU).InstrCONT_EI, Mnemonic: "EI"},
+
+	//Rotation
+	0x07: {Fn: (*CPU).RLCA, Mnemonic: "RLCA"},
+	0x0F: {Fn: (*CPU).RRCA, Mnemonic: "RRCA"},
+	0x17: {Fn: (*CPU).RLA, Mnemonic: "RLA"},
+	0x1F: {Fn: (*CPU).RRA, Mnemonic: "RRA"},
 }
 
 /*
